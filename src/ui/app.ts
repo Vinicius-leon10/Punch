@@ -38,23 +38,35 @@ import {
   type Player,
 } from '../game/state';
 import { playFight } from './fightView';
-import { portrait } from './sprite';
+import { ic } from './icons';
+import { drawStreet } from './scene';
+import { avatar, portrait } from './sprite';
 import { esc, fmtDuration, pct } from './util';
 
 const SAVE_KEY = 'lona.save.v1';
 const CLOCK_KEY = 'lona.clock.v1';
 
 type Tab = 'casa' | 'academia' | 'mestres' | 'lutador' | 'loja' | 'lutar' | 'missoes' | 'vip';
-const TABS: [Tab, string][] = [
-  ['casa', 'Casa'],
-  ['academia', 'Academia'],
-  ['lutar', 'Lutar'],
-  ['lutador', 'Lutador'],
-  ['mestres', 'Mestres'],
-  ['loja', 'Loja'],
-  ['missoes', 'Missões'],
-  ['vip', 'VIP'],
-];
+const MENU: Record<Tab, { label: string; icon: string; hint: string }> = {
+  academia: { label: 'Treinar', icon: 'train', hint: 'Suba seus atributos' },
+  mestres: { label: 'Mestres', icon: 'master', hint: 'Aprenda técnicas' },
+  lutador: { label: 'Lutador', icon: 'fighter', hint: 'Deck e equipamento' },
+  casa: { label: 'Casa', icon: 'home', hint: 'Comer e dormir' },
+  loja: { label: 'Loja', icon: 'shop', hint: 'Luvas, shorts, protetor' },
+  missoes: { label: 'Missões', icon: 'missions', hint: 'Recompensas do dia' },
+  vip: { label: 'VIP', icon: 'vip', hint: 'Mais energia e bônus' },
+  lutar: { label: 'Lutar', icon: 'fight', hint: 'Ranking PvP' },
+};
+const PANEL_TITLE: Record<Tab, string> = {
+  academia: 'Academia',
+  mestres: 'Mestres',
+  lutador: 'Seu lutador',
+  casa: 'Casa',
+  loja: 'Loja',
+  missoes: 'Missões diárias',
+  vip: 'VIP e ouro',
+  lutar: 'Arena PvP',
+};
 
 function readStore(key: string): string | null {
   try {
@@ -84,7 +96,8 @@ export function startApp(root: HTMLElement) {
     player = null;
   }
 
-  let tab: Tab = 'casa';
+  let tab: Tab | null = null;
+  let stageRaf = 0;
   let toast: { msg: string; ok: boolean; at: number } | null = null;
   let opponents: Fighter[] = [];
   let opponentsKey = '';
@@ -133,7 +146,7 @@ export function startApp(root: HTMLElement) {
       <header class="brand"><h1>LONA</h1><p>Do beco ao cinturão. Crie seu lutador.</p></header>
       <div class="create-grid">
         <div class="card preview-card">
-          <canvas data-portrait="preview" width="220" height="300"></canvas>
+          <canvas data-portrait="preview" width="240" height="300"></canvas>
           <div class="muted center">${esc(draft.nickname || 'Seu apelido')}</div>
         </div>
         <div class="card">
@@ -168,27 +181,42 @@ export function startApp(root: HTMLElement) {
     const maxE = maxEnergy(p, t);
     const div = division(p.rankPoints);
     const full = p.energy >= maxE;
+    const hungry = p.satiety < BALANCE.hungryThreshold;
     return `
     <div class="hud-id">
-      <canvas data-portrait="hud" width="48" height="64"></canvas>
-      <div>
+      <div class="avatar"><canvas data-portrait="hud" width="56" height="56"></canvas><span class="lvl">${p.level}</span></div>
+      <div class="hud-who">
         <div class="hud-name">${esc(p.nickname)} ${isVip(p, t) ? '<span class="vip">VIP</span>' : ''}</div>
-        <div class="muted small">${esc(p.name)} · ${ARTS[p.art].name} · Nível ${p.level}</div>
-        <div class="meter xp" title="XP"><span style="width:${pct(p.xp, xpToNext(p.level))}"></span></div>
-        <div class="tiny muted">${p.level >= BALANCE.maxLevel ? 'Nível máximo' : `${p.xp}/${xpToNext(p.level)} XP`}</div>
+        <div class="meter xp" title="XP ${p.xp}/${xpToNext(p.level)}"><span style="width:${pct(p.xp, xpToNext(p.level))}"></span></div>
+        <div class="hud-sub">${ARTS[p.art].name} · <span class="div" style="--c:${div.color}">${div.name} ${p.rankPoints}</span></div>
       </div>
     </div>
-    <div class="hud-stats">
-      <div><span class="lbl">⚡ Energia ${p.energy}/${maxE}</span><div class="meter energy"><span style="width:${pct(p.energy, maxE)}"></span></div>
-        <span class="tiny muted">${full ? 'cheia' : `+1 em ${fmtDuration(A.nextEnergyIn(p, t))}`}</span></div>
-      <div><span class="lbl">🍗 Saciedade ${Math.round(p.satiety)}/${BALANCE.maxSatiety}</span><div class="meter food ${p.satiety < BALANCE.hungryThreshold ? 'warn' : ''}"><span style="width:${pct(p.satiety, BALANCE.maxSatiety)}"></span></div>
-        <span class="tiny muted">${p.satiety < BALANCE.hungryThreshold ? 'com fome!' : '&nbsp;'}</span></div>
-    </div>
-    <div class="hud-money">
-      <span title="Moedas">🪙 ${p.money}</span>
-      <span title="Ouro (moeda premium)">💎 ${p.gold}</span>
-      <span class="div" style="--c:${div.color}" title="Divisão">${div.name} · ${p.rankPoints} pts</span>
+    <div class="hud-res">
+      <div class="res" title="Energia">${ic('energy')}<div><b>${p.energy}<small>/${maxE}</small></b><div class="meter energy"><span style="width:${pct(p.energy, maxE)}"></span></div>
+        <small class="res-sub">${full ? 'cheia' : `+1 em ${fmtDuration(A.nextEnergyIn(p, t))}`}</small></div></div>
+      <div class="res ${hungry ? 'warn' : ''}" title="Saciedade">${ic('food')}<div><b>${Math.round(p.satiety)}<small>/${BALANCE.maxSatiety}</small></b><div class="meter food"><span style="width:${pct(p.satiety, BALANCE.maxSatiety)}"></span></div>
+        <small class="res-sub">${hungry ? 'com fome!' : 'saciedade'}</small></div></div>
+      <div class="res money" title="Moedas">${ic('coin')}<b>${p.money}</b></div>
+      <div class="res money" title="Ouro">${ic('gold')}<b>${p.gold}</b></div>
     </div>`;
+  }
+
+  function home(p: Player): string {
+    const left: Tab[] = ['academia', 'mestres', 'lutador'];
+    const right: Tab[] = ['casa', 'loja', 'missoes', 'vip'];
+    const missionsReady = MISSIONS.some((m) => (p.missions[m.id]?.progress ?? 0) >= m.goal && !p.missions[m.id]?.claimed);
+    const btn = (id: Tab) =>
+      `<button class="mbtn" data-act="tab" data-arg="${id}">${ic(MENU[id].icon, 28)}<span><b>${MENU[id].label}</b><small>${MENU[id].hint}</small></span>${
+        id === 'missoes' && missionsReady ? '<i class="badge">!</i>' : ''
+      }</button>`;
+    return `
+    <section class="stage">
+      <canvas id="stage" aria-label="${esc(p.nickname)} em frente à academia"></canvas>
+      <div class="stage-tag"><b>${esc(p.nickname)}</b><small>${p.wins}V · ${p.losses}D</small></div>
+      <nav class="menu menu-l">${left.map(btn).join('')}</nav>
+      <nav class="menu menu-r">${right.map(btn).join('')}</nav>
+      <button class="fight-cta" data-act="tab" data-arg="lutar">${ic('fight', 34)}<span>LUTAR</span><small>${BALANCE.fightEnergy} de energia</small></button>
+    </section>`;
   }
 
   // ---------------- Abas ----------------
@@ -201,7 +229,7 @@ export function startApp(root: HTMLElement) {
         <h2>Sua casa</h2>
         <canvas data-portrait="home" width="200" height="260"></canvas>
         <p class="muted">${p.wins}V · ${p.losses}D</p>
-        <button class="primary" data-act="sleep" ${t < sleepAt ? 'disabled' : ''}>😴 Dormir (+${BALANCE.sleepEnergy} energia)</button>
+        <button class="primary" data-act="sleep" ${t < sleepAt ? 'disabled' : ''}>${ic('sleep', 14)} Dormir (+${BALANCE.sleepEnergy} energia)</button>
         <p class="tiny muted">${t < sleepAt ? `Sono volta em ${fmtDuration(sleepAt - t)}` : `Pode dormir a cada ${BALANCE.sleepCooldownH}h`}</p>
       </div>
       <div class="card">
@@ -210,7 +238,7 @@ export function startApp(root: HTMLElement) {
         <div class="list">
           ${FOODS.map(
             (f) => `<div class="row"><div><b>${f.name}</b><div class="tiny muted">+${f.satiety} saciedade${f.energy ? ` · +${f.energy} energia` : ''}</div></div>
-              <button data-act="eat" data-arg="${f.id}" ${p.money < f.price ? 'disabled' : ''}>🪙 ${f.price}</button></div>`,
+              <button data-act="eat" data-arg="${f.id}" ${p.money < f.price ? 'disabled' : ''}>${ic('coin', 14)} ${f.price}</button></div>`,
           ).join('')}
         </div>
       </div>
@@ -242,7 +270,7 @@ export function startApp(root: HTMLElement) {
           if (p.level < g.minLevel) btn = `<button disabled>Nível ${g.minLevel}</button>`;
           else if (g.id === p.currentGym) btn = `<button disabled>Treinando aqui</button>`;
           else if (access) btn = `<button data-act="gym" data-arg="${g.id}">Treinar aqui</button>`;
-          else btn = `<button data-act="gympass" data-arg="${g.id}" ${p.money < g.weeklyFee ? 'disabled' : ''}>🪙 ${g.weeklyFee}/semana</button>`;
+          else btn = `<button data-act="gympass" data-arg="${g.id}" ${p.money < g.weeklyFee ? 'disabled' : ''}>${ic('coin', 14)} ${g.weeklyFee}/semana</button>`;
           return `<div class="row"><div><b>${g.name}</b><div class="tiny muted">${g.description}${
             g.weeklyFee && until && until > t ? ` · mensalidade vence em ${fmtDuration(until - t)}` : ''
           }</div></div>${btn}</div>`;
@@ -281,7 +309,7 @@ export function startApp(root: HTMLElement) {
                 ? '<button disabled>Aprendida</button>'
                 : p.level < t.minLevel
                   ? `<button disabled>Nível ${t.minLevel}</button>`
-                  : `<button data-act="learn" data-arg="${t.id}" ${p.money < price ? 'disabled' : ''}>🪙 ${price}</button>`;
+                  : `<button data-act="learn" data-arg="${t.id}" ${p.money < price ? 'disabled' : ''}>${ic('coin', 14)} ${price}</button>`;
               return `<div class="row"><div><b>${t.name}</b> <span class="tag ${t.kind}">${t.kind}</span>
                 <div class="tiny muted">${t.description} ${techLine(t)}</div></div>${btn}</div>`;
             })
@@ -350,7 +378,7 @@ export function startApp(root: HTMLElement) {
           (slot) => `<div class="field-label">${SLOT_LABEL[slot]}</div><div class="shop">${GEAR.filter((g) => g.slot === slot)
             .map((g) => {
               const owned = p.inventory.includes(g.id);
-              const cost = g.currency === 'moedas' ? `🪙 ${g.price}` : `💎 ${g.price}`;
+              const cost = g.currency === 'moedas' ? `${ic('coin', 14)} ${g.price}` : `${ic('gold', 14)} ${g.price}`;
               const can = g.currency === 'moedas' ? p.money >= g.price : p.gold >= g.price;
               const btn = owned
                 ? '<button disabled>Comprado</button>'
@@ -371,9 +399,9 @@ export function startApp(root: HTMLElement) {
       <h2>Suplementos</h2>
       <div class="list">
         <div class="row"><div><b>Whey</b><div class="tiny muted">Próximos ${BALANCE.wheyCharges} treinos rendem +${BALANCE.wheyBonus * 100}%.</div></div>
-          <button data-act="whey" ${p.money < BALANCE.wheyPrice ? 'disabled' : ''}>🪙 ${BALANCE.wheyPrice}</button></div>
+          <button data-act="whey" ${p.money < BALANCE.wheyPrice ? 'disabled' : ''}>${ic('coin', 14)} ${BALANCE.wheyPrice}</button></div>
         <div class="row"><div><b>Energético</b><div class="tiny muted">+${BALANCE.energyDrinkAmount} de energia na hora.</div></div>
-          <button data-act="drink" ${p.gold < BALANCE.energyDrinkGold ? 'disabled' : ''}>💎 ${BALANCE.energyDrinkGold}</button></div>
+          <button data-act="drink" ${p.gold < BALANCE.energyDrinkGold ? 'disabled' : ''}>${ic('gold', 14)} ${BALANCE.energyDrinkGold}</button></div>
       </div>
     </div>`;
   }
@@ -437,7 +465,7 @@ export function startApp(root: HTMLElement) {
           const done = st.progress >= m.goal;
           return `<div class="row"><div><b>${m.label}</b><div class="meter xp"><span style="width:${pct(st.progress, m.goal)}"></span></div>
             <div class="tiny muted">${Math.min(st.progress, m.goal)}/${m.goal}</div></div>
-            <button data-act="claim" data-arg="${m.id}" ${!done || st.claimed ? 'disabled' : ''}>${st.claimed ? 'Resgatada' : `🪙 ${m.reward}`}</button></div>`;
+            <button data-act="claim" data-arg="${m.id}" ${!done || st.claimed ? 'disabled' : ''}>${st.claimed ? 'Resgatada' : `${ic('coin', 14)} ${m.reward}`}</button></div>`;
         }).join('')}
       </div>
     </div>`;
@@ -456,10 +484,10 @@ export function startApp(root: HTMLElement) {
           <li>Selo VIP no nome (visuais exclusivos virão por temporada)</li>
         </ul>
         ${isVip(p, t) ? `<p class="good">VIP ativo — vence em ${fmtDuration(p.vipUntil - t)}</p>` : ''}
-        <button class="primary" data-act="vip" ${p.gold < BALANCE.vipGoldPrice ? 'disabled' : ''}>${isVip(p, t) ? 'Renovar' : 'Ativar'} ${BALANCE.vipDays} dias · 💎 ${BALANCE.vipGoldPrice}</button>
+        <button class="primary" data-act="vip" ${p.gold < BALANCE.vipGoldPrice ? 'disabled' : ''}>${isVip(p, t) ? 'Renovar' : 'Ativar'} ${BALANCE.vipDays} dias · ${ic('gold', 14)} ${BALANCE.vipGoldPrice}</button>
       </div>
       <div class="card">
-        <h2>Comprar ouro 💎</h2>
+        <h2>Comprar ouro ${ic('gold', 14)}</h2>
         <p class="muted small">No jogo online, estes pacotes serão pagos com dinheiro real. Aqui no protótipo a compra é simulada e gratuita.</p>
         <div class="list">
           ${[
@@ -467,7 +495,7 @@ export function startApp(root: HTMLElement) {
             [120, 'R$ 9,90'],
             [300, 'R$ 19,90'],
           ]
-            .map(([g, price]) => `<div class="row"><b>💎 ${g}</b><button data-act="gold" data-arg="${g}">${price} (simulado)</button></div>`)
+            .map(([g, price]) => `<div class="row"><b>${ic('gold', 14)} ${g}</b><button data-act="gold" data-arg="${g}">${price} (simulado)</button></div>`)
             .join('')}
         </div>
       </div>
@@ -476,21 +504,42 @@ export function startApp(root: HTMLElement) {
 
   function gameView(p: Player): string {
     const views: Record<Tab, (p: Player) => string> = { casa, academia, mestres, lutador, loja, lutar, missoes, vip };
-    const missionsReady = MISSIONS.some((m) => (p.missions[m.id]?.progress ?? 0) >= m.goal && !p.missions[m.id]?.claimed);
+    const body = tab
+      ? `<section class="panel">
+          <div class="panel-head"><button class="back" data-act="home">${ic('back', 14)} Menu</button><h1>${ic(MENU[tab].icon, 26)} ${PANEL_TITLE[tab]}</h1></div>
+          ${views[tab](p)}
+        </section>`
+      : home(p);
     return `
     <header class="hud" id="hud">${hud(p)}</header>
-    <nav class="tabs" role="tablist">
-      ${TABS.map(([id, label]) => `<button role="tab" aria-selected="${tab === id}" class="${tab === id ? 'on' : ''}" data-act="tab" data-arg="${id}">${label}${id === 'missoes' && missionsReady ? ' •' : ''}</button>`).join('')}
-    </nav>
     ${toast && Date.now() - toast.at < 6000 ? `<div class="toast ${toast.ok ? 'ok' : 'err'}" role="status">${esc(toast.msg)}</div>` : ''}
-    <main>${views[tab](p)}</main>
+    <main>${body}</main>
     <footer class="dev">
-      <span class="tiny muted">LONA · protótipo v0.1 · Modo teste:</span>
+      <span>Protótipo v0.2 · modo teste</span>
       <button data-act="skip" data-arg="1">Avançar 1h</button>
       <button data-act="skip" data-arg="6">Avançar 6h</button>
       <button data-act="reset" class="danger">${confirmReset ? 'Confirmar: apagar tudo?' : 'Apagar personagem'}</button>
       ${confirmReset ? '<button data-act="cancelreset">Cancelar</button>' : ''}
     </footer>`;
+  }
+
+  function animateStage() {
+    cancelAnimationFrame(stageRaf);
+    const c = root.querySelector<HTMLCanvasElement>('#stage');
+    if (!c || !player) return;
+    const loop = (t: number) => {
+      if (!c.isConnected || !player) return;
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const w = Math.round(c.clientWidth * dpr);
+      const h = Math.round(c.clientHeight * dpr);
+      if (c.width !== w || c.height !== h) {
+        c.width = w;
+        c.height = h;
+      }
+      drawStreet(c, player, 'idle', t);
+      stageRaf = requestAnimationFrame(loop);
+    };
+    stageRaf = requestAnimationFrame(loop);
   }
 
   function drawPortraits() {
@@ -500,7 +549,8 @@ export function startApp(root: HTMLElement) {
       else if (k.startsWith('opp')) {
         const o = opponents[Number(k.slice(3))];
         if (o) portrait(c, o, 'guard');
-      } else if (player) portrait(c, player, k === 'home' ? 'win' : 'idle');
+      } else if (player && k === 'hud') avatar(c, player);
+      else if (player) portrait(c, player, k === 'home' ? 'win' : 'idle');
     });
   }
 
@@ -508,6 +558,7 @@ export function startApp(root: HTMLElement) {
     if (player) A.tick(player, now());
     root.innerHTML = player ? gameView(player) : createView();
     drawPortraits();
+    animateStage();
   }
 
   // ---------------- Eventos ----------------
@@ -543,7 +594,7 @@ export function startApp(root: HTMLElement) {
           return;
         }
         player = createPlayer(draft, t);
-        tab = 'casa';
+        tab = null;
         toast = { msg: `Bem-vindo, ${player.nickname}! Treine, coma e suba no ranking.`, ok: true, at: Date.now() };
         save();
       }
@@ -553,6 +604,12 @@ export function startApp(root: HTMLElement) {
 
     const p = player;
     switch (act) {
+      case 'home':
+        tab = null;
+        toast = null;
+        render();
+        window.scrollTo({ top: 0 });
+        return;
       case 'tab':
         tab = arg as Tab;
         toast = null;
@@ -635,7 +692,7 @@ export function startApp(root: HTMLElement) {
     if (el) {
       el.innerHTML = hud(player);
       const c = el.querySelector<HTMLCanvasElement>('canvas[data-portrait]');
-      if (c) portrait(c, player, 'idle');
+      if (c) avatar(c, player);
     }
   }, 1000);
 

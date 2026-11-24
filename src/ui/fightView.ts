@@ -2,6 +2,7 @@
 import { ARTS, TECH_BY_ID } from '../game/data';
 import type { FightEvent, FightResult } from '../game/fight';
 import type { Fighter } from '../game/state';
+import { ringBackground } from './scene';
 import { drawFighter, type Pose } from './sprite';
 import { esc } from './util';
 
@@ -155,30 +156,16 @@ export function playFight(
     for (const i of [0, 1]) if (t > poseUntil[i]) poses[i] = 'guard';
 
     ctx.imageSmoothingEnabled = false;
-    // Fundo: ringue numa garagem da cidade.
-    ctx.fillStyle = '#1b1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#26243f';
-    for (let i = 0; i < 8; i++) ctx.fillRect(i * 90 + 10, 30, 50, 120);
-    ctx.fillStyle = '#ffd23f22';
-    for (let i = 0; i < 8; i++) ctx.fillRect(i * 90 + 20, 45, 12, 12);
-    ctx.fillStyle = '#3c3a5c';
-    ctx.fillRect(0, 230, canvas.width, 70);
-    ctx.fillStyle = '#5b2a2a';
-    ctx.fillRect(60, 225, canvas.width - 120, 12);
-    ctx.fillStyle = '#c94b4b';
-    for (const yy of [130, 160, 190]) ctx.fillRect(40, yy, canvas.width - 80, 3);
-    ctx.fillStyle = '#ddd';
-    ctx.fillRect(36, 120, 8, 110);
-    ctx.fillRect(canvas.width - 44, 120, 8, 110);
+    // Fundo: ringue com público na penumbra (pixel art ampliada 4x).
+    ctx.drawImage(ringBackground(), 0, 0, canvas.width, canvas.height);
 
     for (const i of [0, 1] as const) {
       const lunge = poses[i] === 'punch' || poses[i] === 'kick' ? 26 : poses[i] === 'hit' ? -10 : 0;
-      drawFighter(ctx, fighters[i], posX(i) + (i === 0 ? lunge : -lunge), 232, 5, i === 0 ? 1 : -1, poses[i], t + i * 300);
+      drawFighter(ctx, fighters[i], posX(i) + (i === 0 ? lunge : -lunge), 236, 4, i === 0 ? 1 : -1, poses[i], t + i * 300);
     }
 
     ctx.textAlign = 'center';
-    ctx.font = '14px "Press Start 2P", monospace';
+    ctx.font = '16px Silkscreen, "Press Start 2P", monospace';
     for (let k = floats.length - 1; k >= 0; k--) {
       const fl = floats[k];
       const age = (t - fl.born) / 900;
@@ -196,7 +183,7 @@ export function playFight(
     const bAge = (t - banner.born) / 1200;
     if (bAge < 1 || banner.text === 'NOCAUTE!') {
       ctx.globalAlpha = banner.text === 'NOCAUTE!' ? 1 : 1 - bAge;
-      ctx.font = '28px "Press Start 2P", monospace';
+      ctx.font = '40px Bungee, Impact, sans-serif';
       ctx.fillStyle = '#000';
       ctx.fillText(banner.text, canvas.width / 2 + 3, 93);
       ctx.fillStyle = banner.text === 'NOCAUTE!' ? '#ff5470' : '#ffd23f';
