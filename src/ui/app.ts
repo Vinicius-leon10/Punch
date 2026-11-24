@@ -88,6 +88,7 @@ export function startApp(root: HTMLElement) {
   let toast: { msg: string; ok: boolean; at: number } | null = null;
   let opponents: Fighter[] = [];
   let opponentsKey = '';
+  let confirmReset = false;
   const draft: NewCharacter = {
     name: '',
     nickname: '',
@@ -154,6 +155,7 @@ export function startApp(root: HTMLElement) {
             <button class="chip ${draft.appearance.tattoo ? 'on' : ''}" data-act="look" data-arg="tattoo">Tatuagem</button>
           </div>
           <button class="primary big" data-act="create">Começar carreira</button>
+          <p id="cerr" class="bad small" role="alert"></p>
           <p class="muted small">Protótipo: o progresso fica salvo neste navegador. Login com Google/Apple entra na versão online.</p>
         </div>
       </div>
@@ -486,7 +488,8 @@ export function startApp(root: HTMLElement) {
       <span class="tiny muted">LONA · protótipo v0.1 · Modo teste:</span>
       <button data-act="skip" data-arg="1">Avançar 1h</button>
       <button data-act="skip" data-arg="6">Avançar 6h</button>
-      <button data-act="reset" class="danger">Apagar personagem</button>
+      <button data-act="reset" class="danger">${confirmReset ? 'Confirmar: apagar tudo?' : 'Apagar personagem'}</button>
+      ${confirmReset ? '<button data-act="cancelreset">Cancelar</button>' : ''}
     </footer>`;
   }
 
@@ -535,7 +538,8 @@ export function startApp(root: HTMLElement) {
       }
       if (act === 'create') {
         if (!draft.name.trim() || !draft.nickname.trim()) {
-          alert('Preencha nome e apelido.');
+          const err = root.querySelector('#cerr');
+          if (err) err.textContent = 'Preencha o nome e o apelido para começar.';
           return;
         }
         player = createPlayer(draft, t);
@@ -601,8 +605,17 @@ export function startApp(root: HTMLElement) {
         clockOffset += Number(arg) * 3600_000;
         writeStore(CLOCK_KEY, String(clockOffset));
         return run({ ok: true, msg: `Relógio avançado ${arg}h (modo teste).` });
+      case 'cancelreset':
+        confirmReset = false;
+        render();
+        return;
       case 'reset':
-        if (!confirm('Apagar o personagem e começar de novo?')) return;
+        if (!confirmReset) {
+          confirmReset = true;
+          render();
+          return;
+        }
+        confirmReset = false;
         player = null;
         clockOffset = 0;
         writeStore(SAVE_KEY, null);
