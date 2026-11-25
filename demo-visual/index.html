@@ -1,0 +1,332 @@
+<meta charset="utf-8">
+<title>LONA Demo Visual</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;600;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+/* Layout: barra de status, palco 16:9 com a arte do jogo, menu de jogo por cima; demonstração navegável por telas. */
+:root {
+  --night: #0b0c18;
+  --panel: #1b1930;
+  --panel2: #26223f;
+  --edge: #050409;
+  --line: #3b3557;
+  --text: #f3eee6;
+  --muted: #b3a99a;
+  --sodium: #ffa043;
+  --neon: #ff4f8b;
+  --blood: #d8343f;
+  --gold: #ffcf3f;
+  --good: #58d68d;
+  --display: 'Bungee', Impact, 'Arial Black', sans-serif;
+  --body: 'Rubik', system-ui, sans-serif;
+  --pixel: 'Silkscreen', 'Courier New', monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: radial-gradient(1000px 420px at 50% -140px, #3a2418, transparent 70%), var(--night); color: var(--text); font: 15px/1.45 var(--body); min-height: 100vh; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--night); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 12px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+img { max-width: 100%; }
+button { font: 600 14px/1.2 var(--body); color: var(--text); cursor: pointer; background: var(--panel2); border: 3px solid var(--edge); border-radius: 6px; padding: 8px 12px; box-shadow: inset 0 3px 0 rgba(255,255,255,.14), inset 0 -4px 0 rgba(0,0,0,.4); display: inline-flex; gap: 8px; align-items: center; justify-content: center; }
+button:hover { filter: brightness(1.15); }
+button:active { transform: translateY(2px); }
+button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.demo-nav { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.demo-nav .lbl { font: 11px var(--pixel); color: var(--muted); margin-right: 4px; letter-spacing: 1px; }
+.demo-nav button { font: 12px var(--pixel); padding: 6px 10px; border-width: 2px; }
+.demo-nav button[aria-pressed="true"] { background: var(--sodium); color: #2a1300; }
+
+.hud { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; background: linear-gradient(#2b2440, #1b1930); border: 3px solid var(--edge); border-radius: 10px; padding: 8px 12px; box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 12px; }
+.who { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.avatar { width: 56px; height: 56px; border: 3px solid var(--edge); border-radius: 8px; overflow: hidden; background: radial-gradient(circle at 50% 70%, #6a3d22, #24150e); position: relative; flex-shrink: 0; }
+.avatar img { position: absolute; width: 150%; left: -18%; top: -4%; }
+.avatar b { position: absolute; right: -2px; bottom: -2px; background: var(--gold); color: #2a1a00; font: 12px var(--display); padding: 0 5px; border: 2px solid var(--edge); border-top-left-radius: 6px; }
+.name { font: 18px var(--display); }
+.sub { font-size: 12px; color: var(--muted); }
+.bar { height: 8px; background: #000; border: 1px solid #000; border-radius: 2px; overflow: hidden; width: 180px; max-width: 100%; margin-top: 3px; }
+.bar i { display: block; height: 100%; box-shadow: inset 0 2px 0 rgba(255,255,255,.3); }
+.res { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { display: flex; align-items: center; gap: 8px; background: #0e0c18; border: 2px solid var(--edge); box-shadow: inset 0 0 0 1px var(--line); border-radius: 8px; padding: 5px 10px; font: 14px var(--pixel); }
+.pill .bar { width: 80px; }
+.dot { width: 12px; height: 12px; border-radius: 3px; border: 2px solid var(--edge); }
+
+/* Palco */
+.stage { position: relative; aspect-ratio: 16 / 9; border: 4px solid var(--edge); border-radius: 12px; overflow: hidden; background: #111 center / cover no-repeat; box-shadow: inset 0 0 0 1px var(--line), 0 10px 0 rgba(0,0,0,.45); }
+.stage::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 55%, rgba(0,0,0,.35)); pointer-events: none; }
+.sprite { position: absolute; bottom: 6%; transform-origin: 50% 100%; filter: drop-shadow(0 6px 4px rgba(0,0,0,.55)); z-index: 1; }
+.stage-wrap { position: relative; }
+.menu { position: absolute; top: calc(4% + 4px); display: flex; flex-direction: column; gap: 8px; z-index: 2; }
+.menu.l { left: calc(2% + 4px); }
+.menu.r { right: calc(2% + 4px); }
+.mbtn { justify-content: flex-start; width: 200px; background: rgba(27,25,48,.9); text-align: left; }
+.mbtn span { display: flex; flex-direction: column; }
+.mbtn b { font: 15px var(--display); font-weight: 400; }
+.mbtn small { font-size: 11.5px; color: var(--muted); font-weight: 400; }
+.mbtn .sw { width: 26px; height: 26px; border-radius: 6px; border: 2px solid var(--edge); flex-shrink: 0; }
+.cta { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); z-index: 3; background: var(--blood); color: #fff; border-width: 4px; padding: 10px 30px; flex-direction: column; gap: 0; box-shadow: inset 0 4px 0 rgba(255,255,255,.25), inset 0 -6px 0 rgba(0,0,0,.35), 0 0 34px rgba(216,52,63,.6); }
+.cta b { font: 30px/1 var(--display); letter-spacing: 2px; }
+.cta small { font: 11px var(--pixel); }
+.cta:active { transform: translateX(-50%) translateY(2px); }
+.title-card { position: absolute; left: 50%; top: 4%; transform: translateX(-50%); z-index: 2; background: rgba(11,12,24,.8); border: 2px solid var(--edge); border-radius: 8px; padding: 4px 16px; text-align: center; }
+.title-card b { display: block; font: 18px var(--display); color: var(--gold); }
+.title-card small { font: 11px var(--pixel); color: var(--muted); }
+.speech { position: absolute; z-index: 3; max-width: 34%; background: #f6efe2; color: #1d1410; border: 3px solid var(--edge); border-radius: 10px; padding: 10px 12px; font-size: 14px; box-shadow: 0 6px 0 rgba(0,0,0,.35); }
+.speech b { display: block; font: 13px var(--display); color: var(--blood); margin-bottom: 2px; }
+.speech::after { content: ""; position: absolute; bottom: -12px; left: 24px; border: 10px solid transparent; border-top-color: #f6efe2; border-bottom: 0; }
+.float { position: absolute; z-index: 4; font: 22px var(--display); color: var(--gold); text-shadow: 3px 3px 0 var(--edge); pointer-events: none; animation: up 1s ease-out forwards; }
+@keyframes up { to { transform: translateY(-60px); opacity: 0; } }
+
+/* Painéis abaixo do palco */
+.panel { margin-top: 14px; background: linear-gradient(var(--panel2), var(--panel) 60px); border: 3px solid var(--edge); border-radius: 10px; padding: 16px; box-shadow: inset 0 0 0 1px var(--line); }
+.panel h2 { font: 18px var(--display); font-weight: 400; color: var(--sodium); margin: 0 0 12px; }
+.grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.card { background: #120f1f; border: 2px solid var(--edge); box-shadow: inset 0 0 0 1px var(--line); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.card b { font: 14px var(--display); font-weight: 400; }
+.card small { color: var(--muted); font-size: 12px; }
+.card button { margin-top: auto; }
+.price { font: 13px var(--pixel); color: var(--gold); }
+.r1 { box-shadow: inset 0 0 0 2px #8a8a8a; } .r2 { box-shadow: inset 0 0 0 2px #3b82f6; } .r3 { box-shadow: inset 0 0 0 2px #a855f7; } .r4 { box-shadow: inset 0 0 0 2px var(--gold), 0 0 14px rgba(255,207,63,.35); }
+.masters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.master { background: radial-gradient(circle at 50% 80%, #4a2c1c, #140f1c 75%); border: 3px solid var(--edge); border-radius: 10px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.master img { height: 220px; object-fit: contain; }
+.master b { font: 15px var(--display); font-weight: 400; color: var(--c); }
+.master small { color: var(--muted); font-size: 12px; }
+.create { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 12px; align-items: stretch; }
+.pick { background: radial-gradient(circle at 50% 80%, #5a3420, #140f1c 75%); border: 3px solid var(--edge); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+.pick[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--gold); }
+.pick img { height: 300px; object-fit: contain; }
+.pick b { font: 16px var(--display); font-weight: 400; }
+.note { margin-top: 14px; font-size: 13px; color: var(--muted); border-left: 3px solid var(--sodium); padding-left: 10px; }
+
+/* Luta */
+.fbars { position: absolute; top: 3%; left: 3%; right: 3%; display: flex; gap: 14px; align-items: center; z-index: 3; }
+.fbar { flex: 1; min-width: 0; }
+.fbar.r { text-align: right; }
+.fbar .n { font: 16px var(--display); text-shadow: 2px 2px 0 var(--edge); }
+.fbar .hp { height: 16px; background: #000; border: 3px solid var(--edge); border-radius: 4px; overflow: hidden; margin-top: 2px; }
+.fbar .hp i { display: block; height: 100%; width: 100%; background: linear-gradient(#ff7b85, #d8343f); transition: width .3s; }
+.fbar.r .hp i { margin-left: auto; }
+.vs { font: 26px var(--display); color: var(--gold); text-shadow: 3px 3px 0 var(--edge); }
+.banner { position: absolute; left: 50%; top: 32%; transform: translateX(-50%); font: clamp(28px, 6vw, 64px) var(--display); color: var(--gold); text-shadow: 4px 4px 0 var(--edge); z-index: 4; white-space: nowrap; }
+.flash { filter: brightness(3) drop-shadow(0 6px 4px rgba(0,0,0,.55)) !important; }
+.shake { animation: shake .25s; }
+@keyframes shake { 25% { translate: -8px 0; } 75% { translate: 8px 0; } }
+
+@media (max-width: 820px) {
+  .stage-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stage-wrap .stage { grid-column: 1 / -1; }
+  .menu { display: contents; }
+  .menu.r .mbtn:last-child { grid-column: 1 / -1; }
+  .mbtn { width: auto; }
+  .mbtn small { display: none; }
+  .speech { max-width: 60%; font-size: 12px; padding: 6px 8px; }
+  .masters { grid-template-columns: 1fr 1fr; }
+  .master img { height: 160px; }
+  .create { grid-template-columns: 1fr 1fr; }
+  .create .panel-col { grid-column: 1 / -1; }
+  .pick img { height: 200px; }
+  .cta { padding: 4px 16px; bottom: 3%; }
+  .cta b { font-size: 16px; }
+  .cta small { display: none; }
+  .fbar .n { font-size: 12px; }
+  .title-card { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .float, .shake { animation: none; } }
+</style>
+
+<div class="wrap">
+  <nav class="demo-nav" aria-label="Telas da demonstração">
+    <span class="lbl">DEMONSTRAÇÃO · TELAS:</span>
+    <button data-go="criar">Criar lutador</button>
+    <button data-go="menu">Menu</button>
+    <button data-go="academia">Academia</button>
+    <button data-go="mestres">Mestres</button>
+    <button data-go="casa">Casa</button>
+    <button data-go="loja">Loja</button>
+    <button data-go="luta">Luta</button>
+  </nav>
+
+  <header class="hud">
+    <div class="who">
+      <div class="avatar"><img id="av" src="img/01.png" alt=""><b>7</b></div>
+      <div>
+        <div class="name" id="nick">O MARTELO</div>
+        <div class="bar"><i style="width:62%;background:#7aa2ff"></i></div>
+        <div class="sub">Boxe · <span style="color:#b8c4cc;font-weight:700">Prata 340</span></div>
+      </div>
+    </div>
+    <div class="res">
+      <div class="pill" title="Energia"><span class="dot" style="background:var(--gold)"></span><span>74/100</span><div class="bar"><i style="width:74%;background:var(--gold)"></i></div></div>
+      <div class="pill" title="Saciedade"><span class="dot" style="background:var(--sodium)"></span><span>58/100</span><div class="bar"><i style="width:58%;background:var(--sodium)"></i></div></div>
+      <div class="pill" title="Moedas"><span class="dot" style="background:#f2c230;border-radius:50%"></span>1.240</div>
+      <div class="pill" title="Ouro"><span class="dot" style="background:#3fb6e8;transform:rotate(45deg)"></span>35</div>
+    </div>
+  </header>
+
+  <main id="screen"></main>
+  <p class="note">Demonstração visual feita só com as 20 imagens geradas no Manus. Botões, preços e números são de exemplo. A luta usa os quadros da folha de animação que já existe; o rival só tem uma pose e se mexe por código.</p>
+</div>
+
+<script>
+const F = (p, n) => Array.from({ length: n }, (_, i) => `img/${p}${i}.png`);
+const ANIM = { idle: F('idle', 4), jab: F('jab', 4), kick: F('kick', 4), hit: F('hit', 3), ko: F('ko', 5), win: F('win', 4) };
+Object.values(ANIM).flat().forEach((s) => { const i = new Image(); i.src = s; });
+let hero = '01';
+let timers = [];
+const clear = () => { timers.forEach(clearInterval); timers.forEach(clearTimeout); timers = []; };
+const $ = (s) => document.querySelector(s);
+
+function idleLoop(img) {
+  let k = 0;
+  timers.push(setInterval(() => { if (img.dataset.busy) return; k = (k + 1) % 4; img.src = ANIM.idle[k]; }, 180));
+}
+function heroSprite(left, h) {
+  return hero === '01'
+    ? `<img class="sprite" id="hero" src="${ANIM.idle[0]}" alt="Seu lutador" style="left:${left}%;height:${h}%">`
+    : `<img class="sprite" id="hero" src="img/02.png" alt="Sua lutadora" style="left:${left}%;height:${h * 1.05}%">`;
+}
+function floatText(stage, text, x, y) {
+  const d = document.createElement('div');
+  d.className = 'float'; d.textContent = text; d.style.left = x + '%'; d.style.top = y + '%';
+  stage.appendChild(d); timers.push(setTimeout(() => d.remove(), 1000));
+}
+const sw = (c) => `<span class="sw" style="background:${c}"></span>`;
+
+const SCREENS = {
+  criar: () => `
+    <div class="create">
+      <div class="pick" data-hero="01" aria-pressed="${hero === '01'}" role="button" tabindex="0"><img src="img/01.png" alt="Lutador"><b>Lutador</b></div>
+      <div class="pick" data-hero="02" aria-pressed="${hero === '02'}" role="button" tabindex="0"><img src="img/02.png" alt="Lutadora"><b>Lutadora</b></div>
+      <div class="panel panel-col" style="margin:0">
+        <h2>Crie seu lutador</h2>
+        <div class="card" style="margin-bottom:10px"><small>Apelido</small><b>O Martelo</b></div>
+        <small class="sub">Arte principal</small>
+        <div class="grid" style="grid-template-columns:1fr 1fr;margin:6px 0 10px">
+          <button style="box-shadow:inset 0 0 0 3px #d94a3d">Boxe</button><button>Muay Thai</button><button>Jiu-jitsu</button><button>Capoeira</button>
+        </div>
+        <small class="sub">Cor da pele, do short e da luva (troca por código)</small>
+        <div style="display:flex;gap:6px;margin:6px 0 12px">${['#f3d2b3','#e0ac7e','#c68642','#8d5524','#5a3519'].map(sw).join('')}</div>
+        <button data-go="menu" style="width:100%;background:var(--neon);font:18px var(--display)">Começar carreira</button>
+      </div>
+    </div>`,
+  menu: () => `
+    <div class="stage-wrap">
+      <section class="stage" style="background-image:url(img/15.jpg)">
+        ${heroSprite(44, 52)}
+        <div class="title-card"><b>O MARTELO</b><small>18V · 6D</small></div>
+        <button class="cta" data-go="luta"><b>LUTAR</b><small>RANKING PVP · 20 DE ENERGIA</small></button>
+      </section>
+      <nav class="menu l">
+        <button class="mbtn" data-go="academia">${sw('#9a96b8')}<span><b>Treinar</b><small>Academia do bairro</small></span></button>
+        <button class="mbtn" data-go="mestres">${sw('#e23b4a')}<span><b>Mestres</b><small>Aprenda técnicas</small></span></button>
+        <button class="mbtn" data-go="criar">${sw('#7ad6e8')}<span><b>Lutador</b><small>Deck e equipamento</small></span></button>
+      </nav>
+      <nav class="menu r">
+        <button class="mbtn" data-go="casa">${sw('#e2504f')}<span><b>Casa</b><small>Comer e dormir</small></span></button>
+        <button class="mbtn" data-go="loja">${sw('#e08a3c')}<span><b>Loja</b><small>Luvas, shorts, protetor</small></span></button>
+        <button class="mbtn">${sw('#2fa860')}<span><b>Missões</b><small>2 prontas para resgatar</small></span></button>
+        <button class="mbtn">${sw('#ffd23f')}<span><b>VIP</b><small>Mais energia e bônus</small></span></button>
+      </nav>
+    </div>`,
+  academia: () => `
+    <section class="stage" style="background-image:url(img/16.jpg)">
+      <img class="sprite" src="img/10.png" alt="Dona Neide" style="left:6%;height:58%">
+      <div class="speech" style="left:4%;top:8%"><b>Dona Neide</b>Saco de pancada não bate de volta. Aproveita, garoto!</div>
+      ${heroSprite(48, 55)}
+    </section>
+    <div class="panel"><h2>Aparelhos</h2><div class="grid">
+      ${[['Saco de pancada','Força',14],['Pular corda','Agilidade',11],['Abdominal','Resistência',12],['Sparring','Técnica',9],['Esteira','Cardio',10]]
+        .map(([n,a,v]) => `<div class="card"><b>${n}</b><small>${a} ${v}</small><button data-train="${a}">Treinar · 10 de energia</button></div>`).join('')}
+    </div></div>`,
+  mestres: () => `
+    <div class="masters">
+      ${[['05','Tião "Mão de Pedra"','Boxe','#e0634f','Jab · Direto · Gancho · Uppercut'],['06','Kru Somchai','Muay Thai','#e0a020','Chute baixo · Joelhada · Chute alto'],['07','Carla "Polvo"','Jiu-jitsu','#5b8fe0','Queda · Chave de braço · Mata-leão'],['08','Bimbinha','Capoeira','#3dab5a','Ginga · Meia-lua · Armada · Rasteira']]
+        .map(([i,n,a,c,t]) => `<div class="master" style="--c:${c}"><img src="img/${i}.png" alt="${n}"><b>${n}</b><small>${a}</small><small>${t}</small><button>Aprender técnicas</button></div>`).join('')}
+    </div>`,
+  casa: () => `
+    <section class="stage" style="background-image:url(img/18.jpg)">${heroSprite(56, 55)}</section>
+    <div class="panel"><h2>Casa</h2><div class="grid">
+      <div class="card"><b>Dormir</b><small>+50 de energia · a cada 6h</small><button>Dormir</button></div>
+      <div class="card" style="flex-direction:row;align-items:center;gap:10px"><img src="img/12.png" alt="Dona da lanchonete" style="height:90px"><div style="display:flex;flex-direction:column;gap:4px"><b>Lanchonete</b><small>Pão com ovo · Marmita · Açaí · Frango com batata-doce</small></div></div>
+    </div></div>`,
+  loja: () => `
+    <section class="stage" style="background-image:url(img/19.jpg)">
+      <img class="sprite" src="img/11.png" alt="Dono da loja" style="left:3%;height:48%;bottom:0">
+      <div class="speech" style="left:24%;top:30%"><b>Dono da loja</b>Chegou luva nova, campeão. Essa aqui é de quem treina sério.</div>
+    </section>
+    <div class="panel"><h2>Luvas</h2><div class="grid">
+      ${[['Luva de Treino','+2 Força','80 moedas','r1','#b03a2e'],['Luva de Couro','+5 Força +1 Técnica','300 moedas','r2','#2e4fb0'],['Luva Profissional','+9 Força +3 Técnica','900 moedas','r3','#7a2eb0'],['Martelo de Ouro','+14 Força +5 Técnica','60 ouro','r4','#e8b923']]
+        .map(([n,b,p,r,c]) => `<div class="card ${r}">${sw(c)}<b>${n}</b><small>${b}</small><span class="price">${p}</span><button>Comprar</button></div>`).join('')}
+    </div></div>`,
+  luta: () => `
+    <section class="stage" id="ring" style="background-image:url(img/20.jpg)">
+      <div class="fbars">
+        <div class="fbar"><div class="n">O MARTELO <small>nv 7</small></div><div class="hp"><i id="hp0"></i></div></div>
+        <div class="vs">VS</div>
+        <div class="fbar r"><div class="n">DÍNAMO <small>nv 8</small></div><div class="hp"><i id="hp1"></i></div></div>
+      </div>
+      <img class="sprite" id="hero" src="${ANIM.idle[0]}" alt="Seu lutador" style="left:29%;height:44%;bottom:24%">
+      <img class="sprite" id="foe" src="img/13.png" alt="Dínamo" style="left:50%;height:48%;bottom:24%;transition:transform .15s">
+    </section>
+    <div class="panel" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button id="replay" style="background:var(--blood);color:#fff;font:16px var(--display)">Ver a luta de novo</button><small class="sub">Luta automática: o resultado é calculado pelo jogo e mostrado com os quadros que já temos.</small></div>`,
+};
+
+const wait = (ms) => new Promise((r) => timers.push(setTimeout(r, ms)));
+async function play(img, frames, ms = 110) { img.dataset.busy = 1; for (const f of frames) { img.src = f; await wait(ms); } delete img.dataset.busy; }
+
+async function fight() {
+  const ring = $('#ring'), h = $('#hero'), f = $('#foe');
+  if (!ring) return;
+  let hp = [100, 100];
+  const set = () => { $('#hp0').style.width = hp[0] + '%'; $('#hp1').style.width = hp[1] + '%'; };
+  set();
+  const banner = (t, ms) => { const b = document.createElement('div'); b.className = 'banner'; b.textContent = t; ring.appendChild(b); if (ms) timers.push(setTimeout(() => b.remove(), ms)); return b; };
+  const hitFoe = async (dmg, x) => { f.classList.add('flash', 'shake'); hp[1] = Math.max(0, hp[1] - dmg); set(); floatText(ring, '-' + dmg, x, 30); await wait(160); f.classList.remove('flash', 'shake'); };
+  const foeAttack = async (dmg) => { f.style.transform = 'translateX(-12%)'; await wait(140); h.classList.add('flash'); await play(h, [ANIM.hit[1], ANIM.hit[2]], 120); h.classList.remove('flash'); hp[0] = Math.max(0, hp[0] - dmg); set(); floatText(ring, '-' + dmg, 34, 24); f.style.transform = ''; await wait(140); h.src = ANIM.idle[0]; };
+  banner('ROUND 1', 1100);
+  await wait(1300);
+  const script = [['jab', 12, 56], ['foe', 14], ['kick', 18, 58], ['jab', 10, 56], ['foe', 22], ['kick', 20, 58], ['foe', 9], ['jab', 14, 56], ['kick', 26, 58]];
+  for (const [who, dmg, x] of script) {
+    if (who === 'foe') await foeAttack(dmg);
+    else { const p = play(h, ANIM[who], 95); await wait(200); await hitFoe(dmg, x); await p; }
+    await wait(380);
+    if (hp[1] <= 0) break;
+  }
+  f.style.transformOrigin = '50% 100%';
+  f.style.transition = 'transform .6s ease-in';
+  f.style.transform = 'translateX(18%) rotate(84deg)';
+  banner('NOCAUTE!');
+  await wait(700);
+  await play(h, ANIM.win, 160);
+  timers.push(setInterval(() => play(h, ANIM.win, 160), 900));
+}
+
+function show(name) {
+  clear();
+  $('#screen').innerHTML = SCREENS[name]();
+  document.querySelectorAll('.demo-nav button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.go === name));
+  $('#av').src = `img/${hero}.png`;
+  const h = $('#hero');
+  if (name === 'luta') fight();
+  else if (h && hero === '01') idleLoop(h);
+}
+
+document.addEventListener('click', async (e) => {
+  const go = e.target.closest('[data-go]');
+  if (go) return show(go.dataset.go);
+  const pk = e.target.closest('[data-hero]');
+  if (pk) { hero = pk.dataset.hero; return show('criar'); }
+  const tr = e.target.closest('[data-train]');
+  if (tr) {
+    const stage = document.querySelector('.stage'), h = $('#hero');
+    if (h && hero === '01') play(h, ANIM.jab, 90);
+    floatText(stage, '+1,2 ' + tr.dataset.train, 50, 30);
+  }
+  if (e.target.closest('#replay')) show('luta');
+});
+show('menu');
+</script>
