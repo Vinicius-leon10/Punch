@@ -2,6 +2,19 @@
 
 Interface escolhida: **estilo A, Arena Mobile** (celular em pé, botões grandes e redondos, cores vivas, barra de abas embaixo).
 
+## Formato do arquivo (importante)
+
+A primeira rodada de poses (`art/v2-poses`) veio em **JPG com o xadrez cinza desenhado na imagem**: ele não é transparente de verdade.
+Também veio com **texto escrito na imagem** ("Tela Inicial", "Personalização com Troca") e com riscos cinza no fundo.
+Assim não dá para colocar o personagem por cima do cenário.
+
+**Troque `transparent background` por este final em todos os prompts:**
+```
+solid flat pure magenta background (#FF00FF), no checkerboard, no text, no labels, no captions, no watermark, one single character centered
+```
+O fundo magenta é removido por código, de forma limpa. Se o Manus oferecer exportar em **PNG com transparência**, também serve.
+Peça **uma pose por imagem**, nunca várias juntas numa folha.
+
 ## Antes de gerar
 
 1. **Envie sempre a imagem de referência** junto com o prompt:
