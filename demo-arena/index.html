@@ -47,7 +47,7 @@ header p { color: var(--muted); margin: 0 0 24px; max-width: 72ch; font-weight: 
 /* Barra superior */
 .top { position: absolute; top: 4cqw; left: 4cqw; right: 4cqw; display: flex; justify-content: space-between; align-items: center; z-index: 3; }
 .me { display: flex; align-items: center; gap: 2cqw; }
-.ava { width: 13cqw; height: 13cqw; border-radius: 50%; border: 1cqw solid #fff; background: url(img/perfil.png) center 30% / 120% no-repeat, linear-gradient(#ffb347, #ff6a3d); position: relative; box-shadow: 0 1cqw 0 var(--purple2); }
+.ava { width: 13cqw; height: 13cqw; border-radius: 50%; border: 1cqw solid #fff; background: url(img/m_perfil.png) center 20% / 110% no-repeat, linear-gradient(#ffb347, #ff6a3d); position: relative; box-shadow: 0 1cqw 0 var(--purple2); }
 .ava b { position: absolute; bottom: -2cqw; left: 50%; transform: translateX(-50%); background: var(--yellow); color: var(--brown); font: 3.6cqw var(--display); padding: 0 2cqw; border-radius: 3cqw; border: .7cqw solid #fff; }
 .nm { font: 4.6cqw/1 var(--display); text-shadow: 0 .6cqw 0 var(--purple2); }
 .nm small { display: block; font: 800 3cqw var(--body); color: #cdb8ff; text-shadow: none; }
@@ -130,6 +130,26 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
 .vs-mid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-8deg); z-index: 3; font: 20cqw/1 var(--display); color: var(--yellow); -webkit-text-stroke: 1cqw var(--brown); text-shadow: 0 1.6cqw 0 var(--brown); }
 .vs-go { position: absolute; left: 50%; bottom: 5cqw; transform: translateX(-50%); z-index: 3; width: 70cqw; }
 
+
+/* Luta */
+.fhud { position: absolute; top: 4cqw; left: 4cqw; right: 4cqw; z-index: 3; display: grid; grid-template-columns: 1fr auto 1fr; gap: 2cqw; align-items: center; font: 3.4cqw var(--display); }
+.fhud .r { text-align: right; }
+.hpb { height: 3.4cqw; background: rgba(0,0,0,.6); border: .7cqw solid #fff; border-radius: 2cqw; overflow: hidden; margin-top: 1cqw; }
+.hpb i { display: block; height: 100%; width: 100%; background: linear-gradient(var(--green), #22a548); transition: width .3s; }
+.fhud .r .hpb i { margin-left: auto; background: linear-gradient(#ff7a8a, var(--pink)); }
+.fvs { font: 6cqw var(--display); color: var(--yellow); -webkit-text-stroke: .5cqw var(--brown); }
+.fighter { position: absolute; bottom: 30%; height: 36%; z-index: 2; transition: transform .12s; filter: drop-shadow(0 2cqw 2cqw rgba(0,0,0,.55)); }
+.hitflash { filter: brightness(2.2) sepia(1) saturate(6) hue-rotate(-20deg) drop-shadow(0 2cqw 2cqw rgba(0,0,0,.55)) !important; }
+.fbanner { position: absolute; left: 0; right: 0; top: 26%; text-align: center; z-index: 4; font: 11cqw var(--display); color: var(--yellow); -webkit-text-stroke: .8cqw var(--brown); text-shadow: 0 1.4cqw 0 var(--brown); opacity: 0; pointer-events: none; }
+.fbanner.show { animation: pop 1.2s ease-out forwards; }
+@keyframes pop { 0% { opacity: 0; transform: scale(.4); } 20% { opacity: 1; transform: scale(1.1); } 80% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+/* Avisos */
+.dim { position: absolute; inset: 0; background: rgba(15,6,40,.72); z-index: 2; }
+.modal { position: absolute; left: 8cqw; right: 8cqw; top: 16%; z-index: 3; background: linear-gradient(var(--purple), var(--purple2)); border: 1cqw solid #fff; border-radius: 7cqw; padding: 5cqw 4cqw 6cqw; text-align: center; box-shadow: 0 2cqw 0 #1d0b55, 0 4cqw 10cqw rgba(0,0,0,.5); }
+.modal .mt { font: 8cqw var(--display); color: var(--yellow); text-shadow: 0 1cqw 0 var(--brown); }
+.modal img { height: 70cqw; max-width: 100%; object-fit: contain; margin: 2cqw auto; display: block; }
+.modal .ms { font-size: 3.6cqw; color: #e7deff; }
+
 .next { margin-top: 36px; background: var(--page2); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
 .next h3 { margin: 0 0 8px; font: 20px var(--display); }
 .next ul { margin: 0; padding-left: 20px; color: var(--muted); font-weight: 600; }
@@ -161,7 +181,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
           <div class="rb" style="background:linear-gradient(var(--yellow),#f29a1b)">♛<small>VIP</small></div>
           <div class="rb" style="background:linear-gradient(#ff7aa8,#e23b6a)">🛍<small>Loja</small></div>
         </div>
-        <img class="pose breathe" src="img/tela_inicial.png" alt="" style="bottom:26%;height:46%">
+        <img class="pose breathe" src="img/m_menu.png" alt="" style="bottom:26%;height:44%">
         <button class="play">LUTAR<small>Partida ranqueada</small></button>
         <nav class="tabs">
           <div class="tab"><span class="ic">⌂</span>Casa</div><div class="tab"><span class="ic">🏋</span>Treinar</div><div class="tab on"><span class="ic">🥊</span>Arena</div><div class="tab"><span class="ic">🥋</span>Mestres</div><div class="tab"><span class="ic">👤</span>Lutador</div>
@@ -176,19 +196,19 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
       <div class="phone">
         <div class="spot"></div><div class="floor"></div>
         <div class="back">‹</div><div class="screen-title">Visual</div>
-        <img class="pose" id="look" src="img/personalizacao.png" alt="Personagem em pé, de frente" style="bottom:34%;height:52%">
+        <img class="pose" id="look" src="img/m_pers.png" alt="Personagem em pé, de frente" style="bottom:34%;height:50%">
         <div class="tray">
           <h3>Shorts</h3>
           <div class="chips" id="shorts">
-            <button class="chip on" data-img="personalizacao"><span class="sw" style="background:#9b3220"></span>Vermelho</button>
-            <button class="chip" data-img="troca"><span class="sw" style="background:#8d8d8d"></span>Cinza</button>
-            <button class="chip" disabled><span class="sw" style="background:#1f6fbf"></span>Azul<span class="lock">🔒 nível 5</span></button>
+            <button class="chip on" data-img="m_pers"><span class="sw" style="background:#9b3220"></span>Vermelho</button>
+            <button class="chip" data-img="m_troca"><span class="sw" style="background:#1f6fbf"></span>Azul</button>
+            <button class="chip" disabled><span class="sw" style="background:#8d8d8d"></span>Cinza<span class="lock">🔒 nível 3</span></button>
             <button class="chip" disabled><span class="sw" style="background:#f2d21b"></span>Raio<span class="lock">🔒 ouro</span></button>
           </div>
           <button class="ok">Salvar visual</button>
         </div>
       </div>
-      <p>De frente, braços relaxados. Toque em <b>Cinza</b> para trocar o short.</p>
+      <p>De frente, braços relaxados. Toque em <b>Azul</b> para trocar short e luvas. <span class="flag">Nessa troca a regata sumiu: a imagem precisa manter a regata.</span></p>
     </article>
 
     <!-- 3. Perfil -->
@@ -197,7 +217,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
       <div class="phone">
         <div class="spot"></div>
         <div class="back">‹</div><div class="screen-title">Perfil</div>
-        <img class="pose" src="img/perfil.png" alt="Rosto do lutador" style="top:16cqw;height:27%;border-radius:50%;background:radial-gradient(#ffb347,#ff6a3d);border:1.4cqw solid #fff;box-shadow:0 1.6cqw 0 var(--purple2)">
+        <img class="pose" src="img/m_perfil.png" alt="Rosto do lutador" style="top:16cqw;height:27%;object-fit:cover;aspect-ratio:1;border-radius:50%;background:radial-gradient(#ffb347,#ff6a3d);border:1.4cqw solid #fff;box-shadow:0 1.6cqw 0 var(--purple2)">
         <div class="card" style="top:80cqw;text-align:center"><div class="nm" style="font-size:7cqw">O Martelo</div><small style="color:var(--muted);font-size:3.2cqw">Nível 7 · Boxe · Prata II</small></div>
         <div class="card" style="top:104cqw">
           <div class="stat">Força<div class="bar"><i style="width:56%"></i></div><b>28</b></div>
@@ -272,34 +292,76 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
       <h2><span>7</span> Antes da luta</h2>
       <div class="phone">
         <div class="vs-wrap">
-          <div class="vs-top"><img src="img/vs.png" alt="O Martelo"><div class="vs-name" style="right:5cqw;top:14cqw;text-align:right">O MARTELO<small>Nível 7 · Boxe</small></div></div>
+          <div class="vs-top"><img src="img/m_vs.png" alt="O Martelo" style="height:100%;left:-6%"><div class="vs-name" style="right:5cqw;top:14cqw;text-align:right">O MARTELO<small>Nível 7 · Boxe</small></div></div>
           <div class="vs-bot"><img src="img/13.png" alt="Dínamo"><div class="vs-name" style="left:5cqw;bottom:30cqw">DÍNAMO<small>Nível 8 · Campeão</small></div></div>
           <div class="vs-mid">VS</div>
           <button class="play vs-go" style="bottom:5cqw">LUTAR!<small>Ranqueada · 20⚡</small></button>
         </div>
       </div>
-      <p>Tela de confronto: busto do jogador em cima, rival embaixo.</p>
+      <p>Tela de confronto: busto do jogador em cima, rival embaixo. O rival ainda usa a imagem de corpo inteiro.</p>
     </article>
 
-    <!-- 8. Faltando -->
+    <!-- 8. Luta -->
     <article class="opt">
-      <h2><span>8</span> Luta e resultado</h2>
-      <div class="phone">
+      <h2><span>8</span> Luta</h2>
+      <div class="phone" id="fight">
         <div class="bg" style="background-image:url(img/20.jpg);background-position:center"></div>
-        <div class="screen-title" style="top:30%;font-size:9cqw;line-height:1.1">Ainda<br>faltam<br>as poses</div>
-        <div class="card" style="bottom:5cqw;font-size:3.4cqw;font-weight:700">Para esta tela faltam: guarda e soco de lado, vitória, derrota e o personagem levando golpe sem a cor vermelha.</div>
+        <div class="fhud">
+          <div><b>O MARTELO</b><div class="hpb"><i id="hp0"></i></div></div>
+          <span class="fvs">VS</span>
+          <div class="r"><b>DÍNAMO</b><div class="hpb"><i id="hp1"></i></div></div>
+        </div>
+        <img class="fighter" id="p" src="img/m_luta0.png" alt="Seu lutador" style="left:6%">
+        <img class="fighter" id="o" src="img/13.png" alt="Dínamo" style="right:2%;height:41%">
+        <div class="fbanner" id="fb"></div>
+        <button class="play" id="refight" style="bottom:4cqw;width:60cqw;font-size:6cqw;padding:2cqw 0 2.4cqw">VER DE NOVO</button>
       </div>
-      <p>Assim que chegarem, esta tela ganha a luta animada no mesmo estilo.</p>
+      <p>Guarda, soco e levando golpe, todos de lado. Os golpes rodam sozinhos; o piscar e o tremor são feitos por código.</p>
+    </article>
+
+    <!-- 9. Resultado -->
+    <article class="opt">
+      <h2><span>9</span> Resultado</h2>
+      <div class="phone">
+        <div class="spot" id="resbg"></div>
+        <div class="screen-title" id="restitle" style="top:10cqw;font-size:11cqw;color:var(--yellow)">VITÓRIA!</div>
+        <img class="pose" id="res" src="img/m_vitoria.png" alt="Resultado" style="bottom:40%;height:44%">
+        <div class="card" id="rescard" style="bottom:26cqw;text-align:center"><div class="rec"><div><b>+25</b><small>Rank</small></div><div><b>+65</b><small>Moedas</small></div><div><b>+75</b><small>XP</small></div></div></div>
+        <div class="acts" id="resacts">
+          <button class="act on" data-img="m_vitoria"><b>Vitória</b><small>exemplo</small></button>
+          <button class="act" data-img="m_derrota"><b>Derrota</b><small>exemplo</small></button>
+        </div>
+      </div>
+      <p>Toque para ver a vitória e a derrota. <span class="flag">Na derrota, os pés saíram com sapatos a mais: refazer.</span></p>
+    </article>
+
+    <!-- 10. Avisos -->
+    <article class="opt">
+      <h2><span>10</span> Avisos</h2>
+      <div class="phone">
+        <div class="bg" style="background-image:url(img/15.jpg);background-position:38% center"></div>
+        <div class="dim"></div>
+        <div class="modal">
+          <div class="mt" id="mt">SUBIU DE NÍVEL!</div>
+          <img id="mimg" src="img/m_nivel.png" alt="Aviso">
+          <div class="ms" id="ms">Nível 8 · +1 espaço no deck</div>
+        </div>
+        <div class="acts" id="msgacts">
+          <button class="act on" data-img="m_nivel" data-t="SUBIU DE NÍVEL!" data-s="Nível 8 · +1 espaço no deck"><b>Nível</b><small>exemplo</small></button>
+          <button class="act" data-img="m_energia" data-t="SEM ENERGIA" data-s="Volta +1 em 2:41 · ou use um energético"><b>Energia</b><small>exemplo</small></button>
+        </div>
+      </div>
+      <p>Janelas que aparecem por cima do menu. Toque para alternar.</p>
     </article>
   </section>
 
   <div class="next">
-    <h3>O que está faltando</h3>
+    <h3>Próximas imagens no Manus</h3>
     <ul>
-      <li><b>Fundo de verdade:</b> as imagens vieram com o xadrez desenhado. Gere de novo com fundo magenta (#FF00FF) para o recorte sair perfeito.</li>
-      <li><b>Luta:</b> guarda, soco, levando golpe, vitória e derrota.</li>
-      <li><b>Ícones dos itens</b> para a loja e a personalização.</li>
-      <li><b>Versão feminina</b> das poses.</li>
+      <li><b>Refazer:</b> troca de short mantendo a regata, e a derrota (os pés saíram errados).</li>
+      <li><b>Rival:</b> busto do Dínamo para a tela de confronto, e ele de lado em guarda e levando golpe.</li>
+      <li><b>Luta:</b> chute alto e nocauteado no chão.</li>
+      <li><b>Academia, casa e loja</b> (dias 7 e 8 do plano) e os <b>ícones dos itens</b>.</li>
     </ul>
   </div>
 </div>
@@ -322,4 +384,52 @@ swap('#acts', '#gym', (b) => {
   g.classList.remove('show'); void g.offsetWidth; g.classList.add('show');
 });
 swap('#homeacts', '#home', (b, img) => { img.style.height = b.dataset.h + '%'; });
+swap('#resacts', '#res', (b, img) => {
+  const win = b.dataset.img === 'm_vitoria';
+  const t = document.getElementById('restitle');
+  t.textContent = win ? 'VITÓRIA!' : 'DERROTA';
+  t.style.color = win ? 'var(--yellow)' : '#ff8a9b';
+  img.style.height = win ? '44%' : '34%';
+  document.getElementById('rescard').innerHTML = win
+    ? '<div class="rec"><div><b>+25</b><small>Rank</small></div><div><b>+65</b><small>Moedas</small></div><div><b>+75</b><small>XP</small></div></div>'
+    : '<div class="rec"><div><b>−15</b><small>Rank</small></div><div><b>+10</b><small>Moedas</small></div><div><b>+29</b><small>XP</small></div></div>';
+});
+swap('#msgacts', '#mimg', (b) => {
+  document.getElementById('mt').textContent = b.dataset.t;
+  document.getElementById('ms').textContent = b.dataset.s;
+});
+
+// Luta automática de exemplo
+const P = document.getElementById('p'), O = document.getElementById('o'), FB = document.getElementById('fb');
+let hp = [100, 100], run = 0;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const bars = () => { document.getElementById('hp0').style.width = hp[0] + '%'; document.getElementById('hp1').style.width = hp[1] + '%'; };
+const banner = (t) => { FB.textContent = t; FB.classList.remove('show'); void FB.offsetWidth; FB.classList.add('show'); };
+async function fight() {
+  const me = ++run;
+  hp = [100, 100]; bars();
+  O.style.transition = 'transform .15s'; O.style.transform = '';
+  P.src = 'img/m_luta0.png';
+  banner('ROUND 1'); await wait(1200);
+  const seq = [['p', 14], ['o', 12], ['p', 18], ['p', 11], ['o', 20], ['p', 22], ['o', 9], ['p', 35]];
+  for (const [who, d] of seq) {
+    if (me !== run) return;
+    if (who === 'p') {
+      P.src = 'img/m_luta1.png'; P.style.transform = 'translateX(14%)';
+      await wait(140); O.classList.add('hitflash'); hp[1] = Math.max(0, hp[1] - d); bars();
+      await wait(220); O.classList.remove('hitflash'); P.src = 'img/m_luta0.png'; P.style.transform = '';
+    } else {
+      O.style.transform = 'translateX(-14%)'; await wait(140);
+      P.src = 'img/m_luta2.png'; P.classList.add('hitflash'); hp[0] = Math.max(0, hp[0] - d); bars();
+      await wait(320); P.classList.remove('hitflash'); P.src = 'img/m_luta0.png'; O.style.transform = '';
+    }
+    await wait(420);
+    if (hp[1] <= 0) break;
+  }
+  if (me !== run) return;
+  O.style.transition = 'transform .6s ease-in'; O.style.transformOrigin = '50% 100%'; O.style.transform = 'translateX(14%) rotate(80deg)';
+  banner('NOCAUTE!');
+}
+document.getElementById('refight').addEventListener('click', fight);
+new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && run === 0 && fight())).observe(document.getElementById('fight'));
 </script>
