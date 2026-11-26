@@ -287,7 +287,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
         <div class="bg" style="background-image:url(img/19.jpg);background-position:40% center"></div>
         <div class="back">‹</div><div class="screen-title">Loja</div>
         <div class="cur" style="position:absolute;top:4cqw;right:4cqw;z-index:4"><div class="pill"><i class="coin"></i>1.240<em>+</em></div></div>
-        <img class="pose breathe" src="img/loja.png" alt="Lutador com luvas novas" style="bottom:44%;height:34%">
+        <img class="pose breathe" src="img/l2_lona_loja.png" alt="Lutador com luvas novas" style="bottom:43%;height:37%">
         <div class="tray">
           <h3>Luvas</h3>
           <div class="items">
@@ -299,7 +299,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
           <button class="ok" style="background:linear-gradient(var(--yellow),var(--orange));color:var(--brown);box-shadow:0 1.2cqw 0 #b35c00">Comprar</button>
         </div>
       </div>
-      <p>De frente, com as luvas novas. Os quadrados coloridos viram os ícones dos itens.</p>
+      <p>De frente, segurando as luvas novas. Os quadrados coloridos viram os ícones dos itens.</p>
     </article>
 
     <!-- 7. Antes da luta -->
@@ -308,12 +308,12 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
       <div class="phone">
         <div class="vs-wrap">
           <div class="vs-top"><img src="img/m_vs.png" alt="O Martelo" style="height:100%;left:-6%"><div class="vs-name" style="right:5cqw;top:14cqw;text-align:right">O MARTELO<small>Nível 7 · Boxe</small></div></div>
-          <div class="vs-bot"><img src="img/13.png" alt="Dínamo"><div class="vs-name" style="left:5cqw;bottom:30cqw">DÍNAMO<small>Nível 8 · Campeão</small></div></div>
+          <div class="vs-bot"><img src="img/l2_rival_vs.png" alt="Dínamo" style="right:-4%;bottom:0;height:100%;transform:none"><div class="vs-name" style="left:5cqw;bottom:30cqw">DÍNAMO<small>Nível 8 · Campeão</small></div></div>
           <div class="vs-mid">VS</div>
           <button class="play vs-go" style="bottom:5cqw">LUTAR!<small>Ranqueada · 20⚡</small></button>
         </div>
       </div>
-      <p>Tela de confronto: busto do jogador em cima, rival embaixo. O rival ainda usa a imagem de corpo inteiro.</p>
+      <p>Tela de confronto: busto do jogador em cima, rival embaixo. </p>
     </article>
 
     <!-- 8. Luta -->
@@ -327,11 +327,11 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
           <div class="r"><b>DÍNAMO</b><div class="hpb"><i id="hp1"></i></div></div>
         </div>
         <img class="fighter" id="p" src="img/m_luta0.png" alt="Seu lutador" style="left:6%">
-        <img class="fighter" id="o" src="img/13.png" alt="Dínamo" style="right:2%;height:41%">
+        <img class="fighter" id="o" src="img/l2_rival_guarda.png" alt="Dínamo" style="right:4%;height:38%">
         <div class="fbanner" id="fb"></div>
         <button class="play" id="refight" style="bottom:4cqw;width:60cqw;font-size:6cqw;padding:2cqw 0 2.4cqw">VER DE NOVO</button>
       </div>
-      <p>Guarda, soco, chute alto e levando golpe, todos de lado. Os golpes rodam sozinhos; o piscar e o tremor são feitos por código.</p>
+      <p>Os dois lutadores com guarda, ataque, golpe e defesa. O rival cai nocauteado no fim. Os golpes rodam sozinhos; o piscar e o tremor são feitos por código.</p>
     </article>
 
     <!-- 9. Resultado -->
@@ -374,8 +374,8 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
     <h3>Próximas imagens no Manus</h3>
     <ul>
       <li><b>Base da personalização:</b> o mesmo corpo do Lote 1, com short vermelho e só as faixas nas mãos.</li>
-      <li><b>Rival:</b> busto do Dínamo para a tela de confronto, e ele de lado em guarda e levando golpe.</li>
-      <li><b>Luta:</b> nocauteado no chão e defesa (Lote 2).</li>
+      
+      <li><b>Base da personalização</b> refeita (no Lote 2 saiu de lado, em guarda).</li>
       <li><b>Academia, casa e loja</b> (dias 7 e 8 do plano) e os <b>ícones dos itens</b>.</li>
     </ul>
   </div>
@@ -430,26 +430,29 @@ const banner = (t) => { FB.textContent = t; FB.classList.remove('show'); void FB
 async function fight() {
   const me = ++run;
   hp = [100, 100]; bars();
-  O.style.transition = 'transform .15s'; O.style.transform = '';
+  O.style.transition = 'transform .15s'; O.style.transform = ''; O.src = 'img/l2_rival_guarda.png'; O.style.height = '38%';
   P.src = 'img/m_luta0.png';
   banner('ROUND 1'); await wait(1200);
-  const seq = [['p', 14], ['o', 12], ['k', 18], ['p', 11], ['o', 20], ['k', 22], ['o', 9], ['k', 35]];
+  const seq = [['p', 14], ['o', 12], ['k', 18], ['d', 3], ['p', 11], ['o', 20], ['k', 22], ['d', 2], ['p', 9], ['k', 35]];
   for (const [who, d] of seq) {
     if (me !== run) return;
     if (who === 'p' || who === 'k') {
       P.src = who === 'k' ? 'img/l1_chute_alto.png' : 'img/m_luta1.png'; P.style.transform = 'translateX(14%)';
-      await wait(140); O.classList.add('hitflash'); hp[1] = Math.max(0, hp[1] - d); bars();
-      await wait(220); O.classList.remove('hitflash'); P.src = 'img/m_luta0.png'; P.style.transform = '';
+      await wait(140); O.src = 'img/l2_rival_golpe.png'; O.classList.add('hitflash'); hp[1] = Math.max(0, hp[1] - d); bars();
+      await wait(260); O.classList.remove('hitflash'); P.src = 'img/m_luta0.png'; P.style.transform = '';
+      if (hp[1] > 0) O.src = 'img/l2_rival_guarda.png';
     } else {
-      O.style.transform = 'translateX(-14%)'; await wait(140);
-      P.src = 'img/m_luta2.png'; P.classList.add('hitflash'); hp[0] = Math.max(0, hp[0] - d); bars();
-      await wait(320); P.classList.remove('hitflash'); P.src = 'img/m_luta0.png'; O.style.transform = '';
+      O.src = 'img/l2_rival_soco.png'; O.style.transform = 'translateX(-10%)'; await wait(140);
+      if (who === 'd') { P.src = 'img/l2_lona_defesa.png'; }
+      else { P.src = 'img/m_luta2.png'; P.classList.add('hitflash'); }
+      hp[0] = Math.max(0, hp[0] - d); bars();
+      await wait(320); P.classList.remove('hitflash'); P.src = 'img/m_luta0.png'; O.src = 'img/l2_rival_guarda.png'; O.style.transform = '';
     }
     await wait(420);
     if (hp[1] <= 0) break;
   }
   if (me !== run) return;
-  O.style.transition = 'transform .6s ease-in'; O.style.transformOrigin = '50% 100%'; O.style.transform = 'translateX(14%) rotate(80deg)';
+  O.src = 'img/l2_rival_nocaute.png'; O.style.height = '15%';
   banner('NOCAUTE!');
 }
 document.getElementById('refight').addEventListener('click', fight);
