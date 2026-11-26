@@ -163,6 +163,19 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
 .menu-food { position: absolute; left: 4cqw; right: 4cqw; bottom: 22cqw; z-index: 3; display: flex; justify-content: space-between; background: rgba(20,8,50,.85); border: .8cqw solid rgba(255,255,255,.25); border-radius: 4cqw; padding: 2cqw 3cqw; }
 .menu-food span { display: flex; flex-direction: column; align-items: center; font-size: 2.6cqw; color: var(--yellow); }
 
+
+.neide { position: absolute; left: 4cqw; right: 4cqw; top: 15cqw; z-index: 3; display: flex; gap: 2cqw; align-items: center; background: #f6efe2; color: #1d1410; border: .8cqw solid #fff; border-radius: 4cqw; padding: 1.6cqw 2.4cqw; font-size: 3.2cqw; font-weight: 700; box-shadow: 0 1cqw 0 rgba(0,0,0,.35); }
+.neide img { width: 13cqw; height: 13cqw; object-fit: cover; object-position: top; border-radius: 50%; background: #ffd9a8; border: .6cqw solid var(--purple2); }
+.neide b { display: block; font: 3.4cqw var(--display); color: #c2410c; }
+.masters-grid { position: absolute; top: 16cqw; left: 4cqw; right: 4cqw; z-index: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 3cqw; }
+.mcard { background: linear-gradient(180deg, var(--c), rgba(20,8,50,.9) 70%); border: .8cqw solid #fff; border-radius: 4cqw; padding: 2cqw; display: flex; flex-direction: column; align-items: center; box-shadow: 0 1.2cqw 0 rgba(0,0,0,.35); }
+.mcard img { width: 100%; height: 28cqw; object-fit: cover; object-position: top; }
+.mcard b { font: 4.4cqw var(--display); margin-top: 1cqw; }
+.mcard small { font-size: 2.8cqw; color: #e7deff; }
+.speech2 { position: absolute; right: 4cqw; bottom: 6cqw; width: 50cqw; z-index: 3; background: #f6efe2; color: #1d1410; border: .8cqw solid #fff; border-radius: 4cqw; padding: 2cqw 2.6cqw; font-size: 3cqw; font-weight: 700; }
+.speech2 b { display: block; font: 3.4cqw var(--display); color: #c2410c; }
+.speech2 em { display: block; margin-top: 1.4cqw; font-style: normal; background: linear-gradient(var(--yellow), var(--orange)); color: var(--brown); border-radius: 2cqw; padding: 1cqw 2cqw; text-align: center; font: 3cqw var(--display); }
+
 .next { margin-top: 36px; background: var(--page2); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
 .next h3 { margin: 0 0 8px; font: 20px var(--display); }
 .next ul { margin: 0; padding-left: 20px; color: var(--muted); font-weight: 600; }
@@ -247,6 +260,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
           <div class="stat">Técnica<div class="bar"><i style="width:52%"></i></div><b>26</b></div>
           <div class="stat" style="margin:0">Cardio<div class="bar"><i style="width:40%"></i></div><b>20</b></div>
         </div>
+        <img src="img/l6_icone_cinturao.png" alt="Cinturão" style="position:absolute;z-index:3;right:6cqw;top:58cqw;width:22cqw;transform:rotate(-8deg);filter:drop-shadow(0 1cqw 0 rgba(0,0,0,.4))">
         <div class="card" style="bottom:5cqw"><div class="rec"><div><b>18</b><small>Vitórias</small></div><div><b>6</b><small>Derrotas</small></div><div><b>11</b><small>Nocautes</small></div></div></div>
       </div>
       <p>Busto de frente para o avatar e a ficha do lutador.</p>
@@ -259,6 +273,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
         <div class="bg" style="background-image:url(img/16.jpg);background-position:30% center"></div>
         <div class="back">‹</div><div class="screen-title">Academia</div>
         <img class="pose" id="gym" src="img/l3_treino_saco.png" alt="Treinando" style="bottom:36%;height:36%">
+        <div class="neide"><img src="img/l6_retrato_neide.png" alt="Dona Neide"><span><b>Dona Neide</b>Bate mais, garoto! Saco não devolve.</span></div>
         <div class="gain" id="gain">+1,2 Força</div>
         <div class="acts" id="acts" style="grid-template-columns:repeat(3,1fr)">
           <button class="act on" data-img="l3_treino_saco" data-g="Força"><b>Saco</b><small>Força</small></button>
@@ -270,6 +285,24 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
         </div>
       </div>
       <p>Os 5 aparelhos, um para cada atributo. Toque para trocar.</p>
+    </article>
+
+    <!-- Mestres -->
+    <article class="opt">
+      <h2><span>4b</span> Mestres</h2>
+      <div class="phone">
+        <div class="spot"></div>
+        <div class="back">‹</div><div class="screen-title">Mestres</div>
+        <div class="masters-grid">
+          <button class="mcard" style="--c:#e0634f"><img src="img/l6_retrato_tiao.png" alt=""><b>Tião</b><small>Boxe</small></button>
+          <button class="mcard" style="--c:#e0a020"><img src="img/l6_retrato_somchai.png" alt=""><b>Somchai</b><small>Muay Thai</small></button>
+          <button class="mcard" style="--c:#5b8fe0"><img src="img/l6_retrato_carla.png" alt=""><b>Carla</b><small>Jiu-jitsu</small></button>
+          <button class="mcard" style="--c:#3dab5a"><img src="img/l6_retrato_bimbinha.png" alt=""><b>Bimbinha</b><small>Capoeira</small></button>
+        </div>
+        <img class="pose" src="img/l6_lona_cumprimento.png" alt="Cumprimento" style="bottom:3%;height:26%;left:22%">
+        <div class="speech2"><b>Tião</b>Jab, direto e gancho. O resto é coração.<em>Gancho · 120 moedas</em></div>
+      </div>
+      <p>Retratos dos 4 mestres e o seu lutador fazendo o cumprimento.</p>
     </article>
 
     <!-- 5. Casa -->
@@ -350,6 +383,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
         <div class="spot" id="resbg"></div>
         <div class="screen-title" id="restitle" style="top:10cqw;font-size:11cqw;color:var(--yellow)">VITÓRIA!</div>
         <img class="pose" id="res" src="img/m_vitoria.png" alt="Resultado" style="bottom:40%;height:44%">
+        <img src="img/l6_icone_bau.png" alt="Baú" style="position:absolute;z-index:3;right:6cqw;bottom:46cqw;width:20cqw">
         <div class="card" id="rescard" style="bottom:26cqw;text-align:center"><div class="rec"><div><b>+25</b><small>Rank</small></div><div><b>+65</b><small>Moedas</small></div><div><b>+75</b><small>XP</small></div></div></div>
         <div class="acts" id="resacts">
           <button class="act on" data-img="m_vitoria"><b>Vitória</b><small>exemplo</small></button>
@@ -370,8 +404,9 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
           <img id="mimg" src="img/m_nivel.png" alt="Aviso">
           <div class="ms" id="ms">Nível 8 · +1 espaço no deck</div>
         </div>
-        <div class="acts" id="msgacts" style="grid-template-columns:repeat(3,1fr)">
+        <div class="acts" id="msgacts" style="grid-template-columns:repeat(2,1fr)">
           <button class="act on" data-img="m_nivel" data-t="SUBIU DE NÍVEL!" data-s="Nível 8 · +1 espaço no deck"><b>Nível</b><small>exemplo</small></button>
+          <button class="act" data-img="l6_lona_joinha" data-t="MISSÃO CUMPRIDA!" data-s="Treine 3 vezes · +50 moedas"><b>Missão</b><small>exemplo</small></button>
           <button class="act" data-img="l3_fome" data-t="COM FOME" data-s="Coma algo antes de treinar"><b>Fome</b><small>exemplo</small></button>
           <button class="act" data-img="m_energia" data-t="SEM ENERGIA" data-s="Volta +1 em 2:41 · ou use um energético"><b>Energia</b><small>exemplo</small></button>
         </div>
@@ -386,7 +421,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
       <li><b>Base da personalização:</b> o mesmo corpo do Lote 1, com short vermelho e só as faixas nas mãos.</li>
       
       
-      <li><b>Retratos</b> dos mestres e da Dona Neide, <b>oponentes</b> e <b>versão feminina</b>.</li>
+      <li><b>Oponentes</b> (falta o resto), <b>ícones do menu</b> e <b>versão feminina</b>.</li>
     </ul>
   </div>
 </div>
