@@ -150,6 +150,13 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
 .modal img { height: 70cqw; max-width: 100%; object-fit: contain; margin: 2cqw auto; display: block; }
 .modal .ms { font-size: 3.6cqw; color: #e7deff; }
 
+
+.chips[hidden] { display: none !important; }
+.ttabs { display: flex; gap: 2cqw; margin-bottom: 2.4cqw; }
+.ttabs button { flex: 1; background: rgba(255,255,255,.12); border-radius: 3cqw; padding: 1.6cqw; font: 4cqw var(--display); color: #d9cfff; }
+.ttabs button.on { background: #fff; color: var(--purple2); }
+#shorts .chip, #luvas .chip { padding: 1.6cqw .4cqw; font-size: 2.5cqw; }
+
 .next { margin-top: 36px; background: var(--page2); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
 .next h3 { margin: 0 0 8px; font: 20px var(--display); }
 .next ul { margin: 0; padding-left: 20px; color: var(--muted); font-weight: 600; }
@@ -198,17 +205,25 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
         <div class="back">‹</div><div class="screen-title">Visual</div>
         <img class="pose" id="look" src="img/m_pers.png" alt="Personagem em pé, de frente" style="bottom:34%;height:50%">
         <div class="tray">
-          <h3>Shorts</h3>
+          <div class="ttabs" id="ttabs"><button class="on" data-t="shorts">Shorts</button><button data-t="luvas">Luvas</button></div>
           <div class="chips" id="shorts">
             <button class="chip on" data-img="m_pers"><span class="sw" style="background:#9b3220"></span>Vermelho</button>
-            <button class="chip" data-img="m_troca"><span class="sw" style="background:#1f6fbf"></span>Azul</button>
-            <button class="chip" disabled><span class="sw" style="background:#8d8d8d"></span>Cinza<span class="lock">🔒 nível 3</span></button>
-            <button class="chip" disabled><span class="sw" style="background:#f2d21b"></span>Raio<span class="lock">🔒 ouro</span></button>
+            <button class="chip" data-img="l1_short_cinza"><span class="sw" style="background:#8d8d8d"></span>Cinza</button>
+            <button class="chip" data-img="l1_short_azul"><span class="sw" style="background:#1f6fbf"></span>Azul</button>
+            <button class="chip" data-img="l1_short_roxo"><span class="sw" style="background:#7a2eb0"></span>Roxo</button>
+            <button class="chip" data-img="l1_short_raio"><span class="sw" style="background:#f2d21b"></span>Raio</button>
+          </div>
+          <div class="chips" id="luvas" hidden>
+            <button class="chip" data-img="m_pers"><span class="sw" style="background:#e9e4da"></span>Faixa</button>
+            <button class="chip" data-img="l1_luva_vermelha"><span class="sw" style="background:#b03a2e"></span>Treino</button>
+            <button class="chip" data-img="l1_luva_azul"><span class="sw" style="background:#2e4fb0"></span>Couro</button>
+            <button class="chip" data-img="l1_luva_roxa"><span class="sw" style="background:#7a2eb0"></span>Pro</button>
+            <button class="chip" data-img="l1_luva_ouro"><span class="sw" style="background:#e8b923"></span>Ouro</button>
           </div>
           <button class="ok">Salvar visual</button>
         </div>
       </div>
-      <p>De frente, braços relaxados. Toque em <b>Azul</b> para trocar short e luvas. <span class="flag">Nessa troca a regata sumiu: a imagem precisa manter a regata.</span></p>
+<p>De frente, braços relaxados. Troque entre <b>Shorts</b> e <b>Luvas</b> e toque nas cores. <span class="flag">O "Vermelho" ainda é a imagem antiga, por isso o corpo muda um pouco.</span></p>
     </article>
 
     <!-- 3. Perfil -->
@@ -316,7 +331,7 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
         <div class="fbanner" id="fb"></div>
         <button class="play" id="refight" style="bottom:4cqw;width:60cqw;font-size:6cqw;padding:2cqw 0 2.4cqw">VER DE NOVO</button>
       </div>
-      <p>Guarda, soco e levando golpe, todos de lado. Os golpes rodam sozinhos; o piscar e o tremor são feitos por código.</p>
+      <p>Guarda, soco, chute alto e levando golpe, todos de lado. Os golpes rodam sozinhos; o piscar e o tremor são feitos por código.</p>
     </article>
 
     <!-- 9. Resultado -->
@@ -329,10 +344,10 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
         <div class="card" id="rescard" style="bottom:26cqw;text-align:center"><div class="rec"><div><b>+25</b><small>Rank</small></div><div><b>+65</b><small>Moedas</small></div><div><b>+75</b><small>XP</small></div></div></div>
         <div class="acts" id="resacts">
           <button class="act on" data-img="m_vitoria"><b>Vitória</b><small>exemplo</small></button>
-          <button class="act" data-img="m_derrota"><b>Derrota</b><small>exemplo</small></button>
+          <button class="act" data-img="l1_derrota"><b>Derrota</b><small>exemplo</small></button>
         </div>
       </div>
-      <p>Toque para ver a vitória e a derrota. <span class="flag">Na derrota, os pés saíram com sapatos a mais: refazer.</span></p>
+      <p>Toque para ver a vitória e a derrota.</p>
     </article>
 
     <!-- 10. Avisos -->
@@ -358,9 +373,9 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
   <div class="next">
     <h3>Próximas imagens no Manus</h3>
     <ul>
-      <li><b>Refazer:</b> troca de short mantendo a regata, e a derrota (os pés saíram errados).</li>
+      <li><b>Base da personalização:</b> o mesmo corpo do Lote 1, com short vermelho e só as faixas nas mãos.</li>
       <li><b>Rival:</b> busto do Dínamo para a tela de confronto, e ele de lado em guarda e levando golpe.</li>
-      <li><b>Luta:</b> chute alto e nocauteado no chão.</li>
+      <li><b>Luta:</b> nocauteado no chão e defesa (Lote 2).</li>
       <li><b>Academia, casa e loja</b> (dias 7 e 8 do plano) e os <b>ícones dos itens</b>.</li>
     </ul>
   </div>
@@ -378,6 +393,13 @@ function swap(groupSel, imgSel, cb) {
   });
 }
 swap('#shorts', '#look');
+swap('#luvas', '#look');
+document.getElementById('ttabs').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#ttabs button').forEach((x) => x.classList.toggle('on', x === b));
+  document.getElementById('shorts').hidden = b.dataset.t !== 'shorts';
+  document.getElementById('luvas').hidden = b.dataset.t !== 'luvas';
+});
 swap('#acts', '#gym', (b) => {
   const g = document.getElementById('gain');
   g.textContent = `+1,2 ${b.dataset.g}`;
@@ -389,7 +411,7 @@ swap('#resacts', '#res', (b, img) => {
   const t = document.getElementById('restitle');
   t.textContent = win ? 'VITÓRIA!' : 'DERROTA';
   t.style.color = win ? 'var(--yellow)' : '#ff8a9b';
-  img.style.height = win ? '44%' : '34%';
+  img.style.height = win ? '44%' : '38%';
   document.getElementById('rescard').innerHTML = win
     ? '<div class="rec"><div><b>+25</b><small>Rank</small></div><div><b>+65</b><small>Moedas</small></div><div><b>+75</b><small>XP</small></div></div>'
     : '<div class="rec"><div><b>−15</b><small>Rank</small></div><div><b>+10</b><small>Moedas</small></div><div><b>+29</b><small>XP</small></div></div>';
@@ -411,11 +433,11 @@ async function fight() {
   O.style.transition = 'transform .15s'; O.style.transform = '';
   P.src = 'img/m_luta0.png';
   banner('ROUND 1'); await wait(1200);
-  const seq = [['p', 14], ['o', 12], ['p', 18], ['p', 11], ['o', 20], ['p', 22], ['o', 9], ['p', 35]];
+  const seq = [['p', 14], ['o', 12], ['k', 18], ['p', 11], ['o', 20], ['k', 22], ['o', 9], ['k', 35]];
   for (const [who, d] of seq) {
     if (me !== run) return;
-    if (who === 'p') {
-      P.src = 'img/m_luta1.png'; P.style.transform = 'translateX(14%)';
+    if (who === 'p' || who === 'k') {
+      P.src = who === 'k' ? 'img/l1_chute_alto.png' : 'img/m_luta1.png'; P.style.transform = 'translateX(14%)';
       await wait(140); O.classList.add('hitflash'); hp[1] = Math.max(0, hp[1] - d); bars();
       await wait(220); O.classList.remove('hitflash'); P.src = 'img/m_luta0.png'; P.style.transform = '';
     } else {
