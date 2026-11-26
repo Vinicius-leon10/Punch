@@ -55,8 +55,8 @@ header p { color: var(--muted); margin: 0 0 24px; max-width: 72ch; font-weight: 
 .pill { display: flex; align-items: center; gap: 1.5cqw; background: rgba(20,8,50,.78); border: .7cqw solid rgba(255,255,255,.25); border-radius: 5cqw; padding: .6cqw .6cqw .6cqw 2.4cqw; font-size: 3.6cqw; }
 .pill i { width: 4.4cqw; height: 4.4cqw; border-radius: 50%; display: inline-block; }
 .pill em { font-style: normal; background: var(--green); width: 4.6cqw; height: 4.6cqw; border-radius: 50%; display: grid; place-items: center; font-size: 4cqw; line-height: 1; box-shadow: 0 .5cqw 0 #1f7a33; }
-.coin { background: radial-gradient(#fff3a8, #f2b51b); }
-.gem { background: radial-gradient(#bff1ff, #2fa8e0); }
+.coin { background: url(img/l3_icone_moedas.png) center / contain no-repeat; border-radius: 0 !important; }
+.gem { background: url(img/l3_icone_diamante.png) center / contain no-repeat; border-radius: 0 !important; }
 .screen-title { position: absolute; top: 4cqw; left: 0; right: 0; text-align: center; z-index: 3; font: 7cqw var(--display); text-shadow: 0 1cqw 0 var(--purple2); }
 .back { position: absolute; top: 4cqw; left: 4cqw; z-index: 4; width: 10cqw; height: 10cqw; border-radius: 3cqw; background: rgba(20,8,50,.8); border: .7cqw solid rgba(255,255,255,.3); display: grid; place-items: center; font-size: 5cqw; }
 
@@ -157,6 +157,12 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
 .ttabs button.on { background: #fff; color: var(--purple2); }
 #shorts .chip, #luvas .chip { padding: 1.6cqw .4cqw; font-size: 2.5cqw; }
 
+
+.ico { width: 9cqw; height: 9cqw; object-fit: contain; }
+.ico.big { width: 11cqw; height: 11cqw; flex-shrink: 0; }
+.menu-food { position: absolute; left: 4cqw; right: 4cqw; bottom: 22cqw; z-index: 3; display: flex; justify-content: space-between; background: rgba(20,8,50,.85); border: .8cqw solid rgba(255,255,255,.25); border-radius: 4cqw; padding: 2cqw 3cqw; }
+.menu-food span { display: flex; flex-direction: column; align-items: center; font-size: 2.6cqw; color: var(--yellow); }
+
 .next { margin-top: 36px; background: var(--page2); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
 .next h3 { margin: 0 0 8px; font: 20px var(--display); }
 .next ul { margin: 0; padding-left: 20px; color: var(--muted); font-weight: 600; }
@@ -203,27 +209,27 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
       <div class="phone">
         <div class="spot"></div><div class="floor"></div>
         <div class="back">‹</div><div class="screen-title">Visual</div>
-        <img class="pose" id="look" src="img/m_pers.png" alt="Personagem em pé, de frente" style="bottom:34%;height:50%">
+        <img class="pose" id="look" src="img/l3_base.png" alt="Personagem em pé, de frente" style="bottom:34%;height:50%">
         <div class="tray">
           <div class="ttabs" id="ttabs"><button class="on" data-t="shorts">Shorts</button><button data-t="luvas">Luvas</button></div>
           <div class="chips" id="shorts">
-            <button class="chip on" data-img="m_pers"><span class="sw" style="background:#9b3220"></span>Vermelho</button>
-            <button class="chip" data-img="l1_short_cinza"><span class="sw" style="background:#8d8d8d"></span>Cinza</button>
-            <button class="chip" data-img="l1_short_azul"><span class="sw" style="background:#1f6fbf"></span>Azul</button>
-            <button class="chip" data-img="l1_short_roxo"><span class="sw" style="background:#7a2eb0"></span>Roxo</button>
-            <button class="chip" data-img="l1_short_raio"><span class="sw" style="background:#f2d21b"></span>Raio</button>
+            <button class="chip on" data-img="l3_base"><span class="sw" style="background:#9b3220"></span>Vermelho</button>
+            <button class="chip" data-img="l1_short_cinza"><img class="ico" src="img/l3_icone_short_comum.png" alt="">Cinza</button>
+            <button class="chip" data-img="l1_short_azul"><img class="ico" src="img/l3_icone_short_raro.png" alt="">Azul</button>
+            <button class="chip" data-img="l1_short_roxo"><img class="ico" src="img/l3_icone_short_epico.png" alt="">Roxo</button>
+            <button class="chip" data-img="l1_short_raio"><img class="ico" src="img/l3_icone_short_lendario.png" alt="">Raio</button>
           </div>
           <div class="chips" id="luvas" hidden>
-            <button class="chip" data-img="m_pers"><span class="sw" style="background:#e9e4da"></span>Faixa</button>
-            <button class="chip" data-img="l1_luva_vermelha"><span class="sw" style="background:#b03a2e"></span>Treino</button>
-            <button class="chip" data-img="l1_luva_azul"><span class="sw" style="background:#2e4fb0"></span>Couro</button>
-            <button class="chip" data-img="l1_luva_roxa"><span class="sw" style="background:#7a2eb0"></span>Pro</button>
-            <button class="chip" data-img="l1_luva_ouro"><span class="sw" style="background:#e8b923"></span>Ouro</button>
+            <button class="chip" data-img="l3_base"><span class="sw" style="background:#e9e4da"></span>Faixa</button>
+            <button class="chip" data-img="l1_luva_vermelha"><img class="ico" src="img/l3_icone_luva_comum.png" alt="">Treino</button>
+            <button class="chip" data-img="l1_luva_azul"><img class="ico" src="img/l3_icone_luva_rara.png" alt="">Couro</button>
+            <button class="chip" data-img="l1_luva_roxa"><img class="ico" src="img/l3_icone_luva_epica.png" alt="">Pro</button>
+            <button class="chip" data-img="l1_luva_ouro"><img class="ico" src="img/l3_icone_luva_lendaria.png" alt="">Ouro</button>
           </div>
           <button class="ok">Salvar visual</button>
         </div>
       </div>
-<p>De frente, braços relaxados. Troque entre <b>Shorts</b> e <b>Luvas</b> e toque nas cores. <span class="flag">O "Vermelho" ainda é a imagem antiga, por isso o corpo muda um pouco.</span></p>
+<p>De frente, braços relaxados. Troque entre <b>Shorts</b> e <b>Luvas</b> e toque nos itens.</p>
     </article>
 
     <!-- 3. Perfil -->
@@ -252,16 +258,18 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
       <div class="phone">
         <div class="bg" style="background-image:url(img/16.jpg);background-position:30% center"></div>
         <div class="back">‹</div><div class="screen-title">Academia</div>
-        <img class="pose" id="gym" src="img/forca.png" alt="Treinando" style="bottom:34%;height:40%">
+        <img class="pose" id="gym" src="img/l3_treino_saco.png" alt="Treinando" style="bottom:36%;height:36%">
         <div class="gain" id="gain">+1,2 Força</div>
-        <div class="acts" id="acts">
-          <button class="act on" data-img="forca" data-g="Força"><b>Saco</b><small>Força · 10⚡</small></button>
-          <button class="act" data-img="agilidade" data-g="Agilidade"><b>Corda</b><small>Agilidade · 10⚡</small></button>
-          <button class="act" data-img="tecnica_s" data-g="Técnica"><b>Manopla</b><small>Técnica · 10⚡</small></button>
-          <button class="act" data-img="cardio_s" data-g="Cardio"><b>Esteira</b><small>Cardio · 10⚡</small></button>
+        <div class="acts" id="acts" style="grid-template-columns:repeat(3,1fr)">
+          <button class="act on" data-img="l3_treino_saco" data-g="Força"><b>Saco</b><small>Força</small></button>
+          <button class="act" data-img="l3_treino_corda" data-g="Agilidade"><b>Corda</b><small>Agilidade</small></button>
+          <button class="act" data-img="l3_treino_abdominal" data-g="Resistência"><b>Abdominal</b><small>Resistência</small></button>
+          <button class="act" data-img="l3_treino_manopla" data-g="Técnica"><b>Manopla</b><small>Técnica</small></button>
+          <button class="act" data-img="l3_treino_esteira" data-g="Cardio"><b>Esteira</b><small>Cardio</small></button>
+          <button class="act" disabled style="opacity:.5"><b>10⚡</b><small>por treino</small></button>
         </div>
       </div>
-      <p>De lado, em cada aparelho. Toque nos botões para trocar. <span class="flag">Manopla e esteira têm falhas por causa do xadrez falso da imagem.</span></p>
+      <p>Os 5 aparelhos, um para cada atributo. Toque para trocar.</p>
     </article>
 
     <!-- 5. Casa -->
@@ -270,11 +278,12 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
       <div class="phone">
         <div class="bg" style="background-image:url(img/18.jpg);background-position:35% center"></div>
         <div class="back">‹</div><div class="screen-title">Casa</div>
-        <img class="pose" id="home" src="img/dormindo_s.png" alt="Em casa" style="bottom:34%;height:30%">
+        <img class="pose" id="home" src="img/l3_dormindo.png" alt="Em casa" style="bottom:34%;height:26%">
+        <div class="menu-food"><span><img class="ico" src="img/l3_icone_pao_ovo.png" alt=""><small>10</small></span><span><img class="ico" src="img/l3_icone_marmita.png" alt=""><small>25</small></span><span><img class="ico" src="img/l3_icone_acai.png" alt=""><small>40</small></span><span><img class="ico" src="img/l3_icone_frango.png" alt=""><small>60</small></span></div>
         <div class="acts" id="homeacts" style="grid-template-columns:repeat(3,1fr)">
-          <button class="act on" data-img="dormindo_s" data-h="30"><b>Dormir</b><small>+50⚡</small></button>
-          <button class="act" data-img="comendo_s" data-h="32"><b>Comer</b><small>+45 fome</small></button>
-          <button class="act" data-img="descansando_s" data-h="30"><b>Descansar</b><small>+10⚡</small></button>
+          <button class="act on" data-img="l3_dormindo" data-h="26"><b>Dormir</b><small>+50⚡</small></button>
+          <button class="act" data-img="l3_comendo" data-h="34"><b>Comer</b><small>+45 fome</small></button>
+          <button class="act" data-img="l3_descansando" data-h="38"><b>Descansar</b><small>+10⚡</small></button>
         </div>
       </div>
       <p>Dormindo, comendo e descansando. Toque para trocar.</p>
@@ -291,15 +300,15 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
         <div class="tray">
           <h3>Luvas</h3>
           <div class="items">
-            <div class="item" style="--r:#8a8a8a"><span class="sw" style="background:#b03a2e"></span><div><b>Treino</b><small>80 moedas</small></div></div>
-            <div class="item" style="--r:#3b82f6"><span class="sw" style="background:#2e4fb0"></span><div><b>Couro</b><small>300 moedas</small></div></div>
-            <div class="item" style="--r:#a855f7"><span class="sw" style="background:#7a2eb0"></span><div><b>Profissional</b><small>900 moedas</small></div></div>
-            <div class="item" style="--r:var(--yellow)"><span class="sw" style="background:#e8b923"></span><div><b>Martelo de Ouro</b><small>60 ouro</small></div></div>
+            <div class="item" style="--r:#8a8a8a"><img class="ico big" src="img/l3_icone_luva_comum.png" alt=""><div><b>Treino</b><small>80 moedas</small></div></div>
+            <div class="item" style="--r:#3b82f6"><img class="ico big" src="img/l3_icone_luva_rara.png" alt=""><div><b>Couro</b><small>300 moedas</small></div></div>
+            <div class="item" style="--r:#a855f7"><img class="ico big" src="img/l3_icone_luva_epica.png" alt=""><div><b>Profissional</b><small>900 moedas</small></div></div>
+            <div class="item" style="--r:var(--yellow)"><img class="ico big" src="img/l3_icone_luva_lendaria.png" alt=""><div><b>Martelo de Ouro</b><small>60 ouro</small></div></div>
           </div>
           <button class="ok" style="background:linear-gradient(var(--yellow),var(--orange));color:var(--brown);box-shadow:0 1.2cqw 0 #b35c00">Comprar</button>
         </div>
       </div>
-      <p>De frente, segurando as luvas novas. Os quadrados coloridos viram os ícones dos itens.</p>
+      <p>De frente, segurando as luvas novas, com os ícones de cada luva.</p>
     </article>
 
     <!-- 7. Antes da luta -->
@@ -361,8 +370,9 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
           <img id="mimg" src="img/m_nivel.png" alt="Aviso">
           <div class="ms" id="ms">Nível 8 · +1 espaço no deck</div>
         </div>
-        <div class="acts" id="msgacts">
+        <div class="acts" id="msgacts" style="grid-template-columns:repeat(3,1fr)">
           <button class="act on" data-img="m_nivel" data-t="SUBIU DE NÍVEL!" data-s="Nível 8 · +1 espaço no deck"><b>Nível</b><small>exemplo</small></button>
+          <button class="act" data-img="l3_fome" data-t="COM FOME" data-s="Coma algo antes de treinar"><b>Fome</b><small>exemplo</small></button>
           <button class="act" data-img="m_energia" data-t="SEM ENERGIA" data-s="Volta +1 em 2:41 · ou use um energético"><b>Energia</b><small>exemplo</small></button>
         </div>
       </div>
@@ -375,8 +385,8 @@ button:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
     <ul>
       <li><b>Base da personalização:</b> o mesmo corpo do Lote 1, com short vermelho e só as faixas nas mãos.</li>
       
-      <li><b>Base da personalização</b> refeita (no Lote 2 saiu de lado, em guarda).</li>
-      <li><b>Academia, casa e loja</b> (dias 7 e 8 do plano) e os <b>ícones dos itens</b>.</li>
+      
+      <li><b>Retratos</b> dos mestres e da Dona Neide, <b>oponentes</b> e <b>versão feminina</b>.</li>
     </ul>
   </div>
 </div>
