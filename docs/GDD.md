@@ -20,7 +20,7 @@ aprende técnicas com mestres, compra equipamentos e sobe no **ranking PvP** enf
 | Plataforma | Navegador (PC + celular); pode virar app depois |
 | Conta | Login com **Google** e **Apple** |
 | Visual | **Pixel art urbano**, arte própria gerada com IA (pasta `art/`) |
-| Interface | **Estilo A, Arena Mobile**: celular em pé, botões grandes e redondos, cores vivas, barra de abas embaixo |
+| Interface | **Estilo A, Arena Mobile**: celular em pé, **tela fixa sem rolar a página** (topo · conteúdo · abas), abas internas nas telas longas e só listas rolando por dentro; no PC aparece como um celular no meio da tela |
 | Personalização | Personagem **de frente, em pé, braços relaxados**; troca de short e luvas sobre essa pose |
 | Ciclo | Treinar · Comer · Dormir · Lutar |
 | Necessidades | **Energia** e **Saciedade** (versão simplificada) |

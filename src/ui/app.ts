@@ -108,6 +108,7 @@ export function startApp(root: HTMLElement) {
   let opponents: Fighter[] = [];
   let opponentsKey = '';
   let confirmReset = false;
+  let devOpen = false;
   const draft: NewCharacter = {
     name: '',
     nickname: '',
@@ -159,7 +160,7 @@ export function startApp(root: HTMLElement) {
         <div class="card">
           <label>Nome<input id="cname" maxlength="16" value="${esc(draft.name)}" placeholder="Ex.: Vinícius" /></label>
           <label>Apelido de lutador<input id="cnick" maxlength="16" value="${esc(draft.nickname)}" placeholder="Ex.: O Martelo" /></label>
-          <div class="field-label">Arte principal (fixa — dá mais força nas técnicas dela)</div>
+          <div class="field-label">Arte principal (fixa)</div>
           <div class="arts">
             ${ART_IDS.map(
               (id) => `<button class="art ${draft.art === id ? 'on' : ''}" data-act="art" data-arg="${id}" style="--c:${ARTS[id].color}">
@@ -184,6 +185,15 @@ export function startApp(root: HTMLElement) {
   }
 
   // ---------------- HUD ----------------
+  // ---------------- Tela fixa: topo · conteúdo · abas ----------------
+  /** Abas internas de cada tela (a escolha fica só nesta sessão). */
+  const sub: Partial<Record<Tab, string>> = {};
+  const curSub = (t: Tab, def: string) => sub[t] ?? def;
+  const subtabs = (t: Tab, opts: [string, string][], def: string) =>
+    `<div class="subtabs" role="tablist">${opts
+      .map(([k, label]) => `<button role="tab" class="${curSub(t, def) === k ? 'on' : ''}" aria-selected="${curSub(t, def) === k}" data-act="sub" data-arg="${t}:${k}">${label}</button>`)
+      .join('')}</div>`;
+
   function hud(p: Player): string {
     const t = now();
     const maxE = maxEnergy(p, t);
@@ -191,21 +201,20 @@ export function startApp(root: HTMLElement) {
     const full = p.energy >= maxE;
     const hungry = p.satiety < BALANCE.hungryThreshold;
     return `
-    <div class="hud-id">
+    <div class="hud-row">
       <div class="avatar">${poseImg(bodyOf(p), 'perfil', 'avatar-img')}<span class="lvl">${p.level}</span></div>
       <div class="hud-who">
         <div class="hud-name">${esc(p.nickname)} ${isVip(p, t) ? '<span class="vip">VIP</span>' : ''}</div>
         <div class="meter xp" title="XP ${p.xp}/${xpToNext(p.level)}"><span style="width:${pct(p.xp, xpToNext(p.level))}"></span></div>
         <div class="hud-sub">${ARTS[p.art].name} · <span class="div" style="--c:${div.color}">${div.name} ${p.rankPoints}</span></div>
       </div>
+      <button class="gear" data-act="dev" aria-label="Opções de teste" aria-expanded="${devOpen}">⚙</button>
     </div>
     <div class="hud-res">
-      <div class="res" title="Energia">${ic('energy')}<div><b>${p.energy}<small>/${maxE}</small></b><div class="meter energy"><span style="width:${pct(p.energy, maxE)}"></span></div>
-        <small class="res-sub">${full ? 'cheia' : `+1 em ${fmtDuration(A.nextEnergyIn(p, t))}`}</small></div></div>
-      <div class="res ${hungry ? 'warn' : ''}" title="Saciedade">${ic('food')}<div><b>${Math.round(p.satiety)}<small>/${BALANCE.maxSatiety}</small></b><div class="meter food"><span style="width:${pct(p.satiety, BALANCE.maxSatiety)}"></span></div>
-        <small class="res-sub">${hungry ? 'com fome!' : 'saciedade'}</small></div></div>
-      <div class="res money" title="Moedas">${ic('coin')}<b>${p.money}</b></div>
-      <div class="res money" title="Ouro">${ic('gold')}<b>${p.gold}</b></div>
+      <div class="res" title="Energia${full ? '' : ` · +1 em ${fmtDuration(A.nextEnergyIn(p, t))}`}">${ic('energy', 18)}<div><b>${p.energy}<small>/${maxE}</small></b><div class="meter energy"><span style="width:${pct(p.energy, maxE)}"></span></div></div></div>
+      <div class="res ${hungry ? 'warn' : ''}" title="Saciedade">${ic('food', 18)}<div><b>${Math.round(p.satiety)}<small>/${BALANCE.maxSatiety}</small></b><div class="meter food"><span style="width:${pct(p.satiety, BALANCE.maxSatiety)}"></span></div></div></div>
+      <div class="res money" title="Moedas">${ic('coin', 20)}<b>${p.money}</b></div>
+      <div class="res money" title="Ouro">${ic('gold', 20)}<b>${p.gold}</b></div>
     </div>`;
   }
 
@@ -232,7 +241,7 @@ export function startApp(root: HTMLElement) {
     </section>`;
   }
 
-  /** Barra de abas fixa embaixo, como no app: Casa · Treinar · Arena (início) · Mestres · Lutador. */
+  /** Barra de abas embaixo, como no app: Casa · Treinar · Arena (início) · Mestres · Lutador. */
   function tabBar(): string {
     const item = (id: Tab | null, label: string, icon: string) => {
       const on = tab === id || (id === null && (tab === null || tab === 'lutar'));
@@ -246,77 +255,77 @@ export function startApp(root: HTMLElement) {
     const t = now();
     const sleepAt = A.sleepReadyAt(p);
     return `
-    <div class="grid2">
-      <div class="card center">
-        <h2>Sua casa</h2>
-        ${scene('bg_casa', poseImg(bodyOf(p), casaPose, `pose ${casaPose}`), 'room')}
-        <p class="muted">${p.wins}V · ${p.losses}D</p>
-        <button class="primary" data-act="sleep" ${t < sleepAt ? 'disabled' : ''}>${ic('sleep', 14)} Dormir (+${BALANCE.sleepEnergy} energia)</button>
-        <p class="tiny muted">${t < sleepAt ? `Sono volta em ${fmtDuration(sleepAt - t)}` : `Pode dormir a cada ${BALANCE.sleepCooldownH}h`}</p>
+    ${scene('bg_casa', poseImg(bodyOf(p), casaPose, `pose ${casaPose}`), 'room')}
+    <div class="bar-row">
+      <button class="primary" data-act="sleep" ${t < sleepAt ? 'disabled' : ''}>${ic('sleep', 14)} Dormir +${BALANCE.sleepEnergy}</button>
+      <span class="tiny muted">${t < sleepAt ? `Sono volta em ${fmtDuration(sleepAt - t)}` : `Pode dormir a cada ${BALANCE.sleepCooldownH}h`}</span>
+    </div>
+    <div class="pane">
+      <div class="tiles">
+        ${FOODS.map(
+          (f) => `<div class="tile">${img(FOOD_IMG[f.id], 'tile-img')}<b>${f.name}</b><small>+${f.satiety} saciedade${f.energy ? ` · +${f.energy} energia` : ''}</small>
+            <button data-act="eat" data-arg="${f.id}" ${p.money < f.price ? 'disabled' : ''}>${ic('coin', 14)} ${f.price}</button></div>`,
+        ).join('')}
       </div>
-      <div class="card">
-        <h2>Geladeira</h2>
-        <p class="muted small">Treinar e lutar dão fome. Com menos de ${BALANCE.hungryThreshold} de saciedade o treino rende metade; com 0 você não treina nem luta.</p>
-        <div class="list">
-          ${FOODS.map(
-            (f) => `<div class="row">${img(FOOD_IMG[f.id], 'row-img')}<div><b>${f.name}</b><div class="tiny muted">+${f.satiety} saciedade${f.energy ? ` · +${f.energy} energia` : ''}</div></div>
-              <button data-act="eat" data-arg="${f.id}" ${p.money < f.price ? 'disabled' : ''}>${ic('coin', 14)} ${f.price}</button></div>`,
-          ).join('')}
-        </div>
-      </div>
+      <p class="tiny muted">Com menos de ${BALANCE.hungryThreshold} de saciedade o treino rende metade; com 0 você não treina nem luta.</p>
     </div>`;
   }
 
   function trabalho(p: Player): string {
     return `
-    <div class="card">
-      <h2>Bicos</h2>
-      <div class="host">${img('lanchonete', 'host-img')}<p class="muted small">Trabalhar troca energia por moedas, sem XP. Rende menos que lutar, mas é dinheiro garantido quando a fase está difícil.</p></div>
+    <div class="host">${img('lanchonete', 'host-img')}<p class="muted small">Trabalhar troca energia por moedas, sem XP. Rende menos que lutar, mas é dinheiro garantido.</p></div>
+    <div class="pane">
       <div class="list">
         ${JOBS.map((j) => {
           const btn =
             p.level < j.minLevel
               ? `<button disabled>Nível ${j.minLevel}</button>`
               : `<button data-act="work" data-arg="${j.id}" ${p.energy < j.energy ? 'disabled' : ''}>${ic('coin', 14)} +${A.jobPay(p.level, j.id)}</button>`;
-          return `<div class="row">${img(jobImg(bodyOf(p), j.id), 'row-img job')}<div><b>${j.name}</b><div class="tiny muted">${j.description} ${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
+          return `<div class="row">${img(jobImg(bodyOf(p), j.id), 'row-img job')}<div><b>${j.name}</b><div class="tiny muted">${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
         }).join('')}
       </div>
     </div>`;
   }
 
+  const SHORT_STATION: Record<string, string> = { saco: 'Saco', corda: 'Corda', abdominal: 'Abdominal', sparring: 'Sparring', esteira: 'Esteira' };
+
   function academia(p: Player): string {
     const t = now();
     const gym = GYMS.find((g) => g.id === p.currentGym) ?? GYMS[0];
-    return `
-    ${scene('bg_academia', img(stationImg(bodyOf(p), gymStation), 'pose train'), 'room')}
-    <div class="card">
-      <h2>${gym.name}</h2>
-      <div class="host">${gym.id === 'bairro' ? img('retrato_neide', 'host-img', 'Dona Neide') : ''}<p class="muted small">${gym.id === 'bairro' ? '<b>Dona Neide</b>, dona da academia, cuida do seu treino. ' : ''}Cada treino gasta ${BALANCE.trainEnergy} de energia e ${BALANCE.trainSatiety} de saciedade, dá XP ao personagem e aumenta um atributo. Quanto mais alto o atributo, menos ele sobe por treino.
-      ${p.wheyCharges > 0 ? `<br><b>Whey ativo:</b> ${p.wheyCharges} treinos com +${BALANCE.wheyBonus * 100}%.` : ''}</p></div>
-      <div class="stations">
-        ${STATIONS.map(
-          (s) => `<button class="station" data-act="train" data-arg="${s.id}" ${p.energy < BALANCE.trainEnergy ? 'disabled' : ''}>
-            ${img(stationImg(bodyOf(p), s.id), 'station-img')}<b>${s.name}</b><span>${ATTR_LABEL[s.attr]} ${Math.floor(p.attrs[s.attr])}</span></button>`,
-        ).join('')}
-      </div>
-    </div>
-    <div class="card">
-      <h2>Academias</h2>
-      <div class="list">
-        ${GYMS.map((g) => {
-          const access = A.gymAccess(p, g.id, t);
-          const until = p.gymPasses[g.id];
-          let btn: string;
-          if (p.level < g.minLevel) btn = `<button disabled>Nível ${g.minLevel}</button>`;
-          else if (g.id === p.currentGym) btn = `<button disabled>Treinando aqui</button>`;
-          else if (access) btn = `<button data-act="gym" data-arg="${g.id}">Treinar aqui</button>`;
-          else btn = `<button data-act="gympass" data-arg="${g.id}" ${p.money < g.weeklyFee ? 'disabled' : ''}>${ic('coin', 14)} ${g.weeklyFee}/semana</button>`;
-          return `<div class="row"><div><b>${g.name}</b><div class="tiny muted">${g.description}${
-            g.weeklyFee && until && until > t ? ` · mensalidade vence em ${fmtDuration(until - t)}` : ''
-          }</div></div>${btn}</div>`;
-        }).join('')}
-      </div>
-    </div>`;
+    const view = curSub('academia', 'treinar');
+    const body =
+      view === 'treinar'
+        ? `
+      ${scene('bg_academia', `${img(stationImg(bodyOf(p), gymStation), 'pose train')}${
+        gym.id === 'bairro' ? `<div class="speech">${img('retrato_neide', 'speech-img', 'Dona Neide')}<span><b>Dona Neide</b>Cada treino: ${BALANCE.trainEnergy} de energia e ${BALANCE.trainSatiety} de saciedade.</span></div>` : ''
+      }`, 'room')}
+      <div class="pane">
+        <div class="stations">
+          ${STATIONS.map(
+            (s) => `<button class="station" data-act="train" data-arg="${s.id}" ${p.energy < BALANCE.trainEnergy ? 'disabled' : ''}>
+              ${img(stationImg(bodyOf(p), s.id), 'station-img')}<b>${SHORT_STATION[s.id] ?? s.name}</b><span>${ATTR_LABEL[s.attr]} ${Math.floor(p.attrs[s.attr])}</span></button>`,
+          ).join('')}
+        </div>
+        ${p.wheyCharges > 0 ? `<p class="tiny"><b>Whey ativo:</b> ${p.wheyCharges} treinos com +${BALANCE.wheyBonus * 100}%.</p>` : ''}
+      </div>`
+        : `
+      <div class="pane">
+        <div class="list">
+          ${GYMS.map((g) => {
+            const access = A.gymAccess(p, g.id, t);
+            const until = p.gymPasses[g.id];
+            let btn: string;
+            if (p.level < g.minLevel) btn = `<button disabled>Nível ${g.minLevel}</button>`;
+            else if (g.id === p.currentGym) btn = `<button disabled>Aqui</button>`;
+            else if (access) btn = `<button data-act="gym" data-arg="${g.id}">Treinar aqui</button>`;
+            else btn = `<button data-act="gympass" data-arg="${g.id}" ${p.money < g.weeklyFee ? 'disabled' : ''}>${ic('coin', 14)} ${g.weeklyFee}/sem</button>`;
+            return `<div class="row"><div><b>${g.name}</b><div class="tiny muted">${g.description}${
+              g.weeklyFee && until && until > t ? ` · vence em ${fmtDuration(until - t)}` : ''
+            }</div></div>${btn}</div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    return subtabs('academia', [['treinar', gym.name], ['academias', 'Academias']], 'treinar') + body;
   }
 
   const techLine = (t: Technique) => {
@@ -334,33 +343,32 @@ export function startApp(root: HTMLElement) {
 
   function mestres(p: Player): string {
     const order = [p.art, ...ART_IDS.filter((a) => a !== p.art)];
-    return `<div class="card"><div class="host">${poseImg(bodyOf(p), 'mestres', 'host-img')}<p class="muted small">Cumprimente o mestre e aprenda as técnicas. As da sua arte saem mais baratas e batem mais forte.</p></div></div>` + order
-      .map(
-        (art: ArtId) => `
-      <div class="card">
-        <div class="host">${img(MASTER_IMG[art], 'host-img', ARTS[art].master)}<div>
-        <h2 style="color:${ARTS[art].color}">${ARTS[art].master} · ${ARTS[art].name}</h2>
-        <p class="muted small">${art === p.art ? 'Sua arte principal: técnicas com +20% de dano e preço normal.' : 'Outra arte: custa 50% a mais, sem bônus de dano. Use para cobrir fraquezas (defesa, chão, chutes).'}</p></div></div>
-        <div class="list">
-          ${TECHNIQUES.filter((t) => t.art === art)
-            .map((t) => {
-              const known = p.techniques.includes(t.id);
-              const price = A.techPrice(p, t);
-              const btn = known
-                ? '<button disabled>Aprendida</button>'
-                : p.level < t.minLevel
-                  ? `<button disabled>Nível ${t.minLevel}</button>`
-                  : t.requires && !p.techniques.includes(t.requires)
-                    ? `<button disabled>Antes: ${TECH_BY_ID[t.requires].name}</button>`
-                    : `<button data-act="learn" data-arg="${t.id}" ${p.money < price ? 'disabled' : ''}>${ic('coin', 14)} ${price}</button>`;
-              return `<div class="row"><div><b>${t.name}</b> <span class="tag ${t.kind}">${t.kind}</span>
-                <div class="tiny muted">${t.description} ${techLine(t)}${t.requires ? ` · requer ${TECH_BY_ID[t.requires].name}` : ''}</div></div>${btn}</div>`;
-            })
-            .join('')}
-        </div>
-      </div>`,
-      )
-      .join('');
+    const art = curSub('mestres', p.art) as ArtId;
+    const short = (a: ArtId) => ARTS[a].master.replace(/^(Mestre|Mestra|Kru) /, '').replace(/ ".*"$/, '');
+    return `
+    ${subtabs('mestres', order.map((a) => [a, short(a)] as [string, string]), p.art)}
+    <div class="host master-head" style="--c:${ARTS[art].color}">${img(MASTER_IMG[art], 'host-img', ARTS[art].master)}<div>
+      <h2 style="color:${ARTS[art].color}">${ARTS[art].name}</h2>
+      <p class="tiny muted">${art === p.art ? 'Sua arte principal: +20% de dano e preço normal.' : 'Outra arte: 50% mais cara, sem bônus. Serve para cobrir fraquezas.'}</p></div></div>
+    <div class="pane">
+      <div class="list">
+        ${TECHNIQUES.filter((t) => t.art === art)
+          .map((t) => {
+            const known = p.techniques.includes(t.id);
+            const price = A.techPrice(p, t);
+            const btn = known
+              ? '<button disabled>Aprendida</button>'
+              : p.level < t.minLevel
+                ? `<button disabled>Nível ${t.minLevel}</button>`
+                : t.requires && !p.techniques.includes(t.requires)
+                  ? `<button disabled>Antes: ${TECH_BY_ID[t.requires].name}</button>`
+                  : `<button data-act="learn" data-arg="${t.id}" ${p.money < price ? 'disabled' : ''}>${ic('coin', 14)} ${price}</button>`;
+            return `<div class="row"><div><b>${t.name}</b> <span class="tag ${t.kind}">${t.kind}</span>
+              <div class="tiny muted">${techLine(t)}${t.requires ? ` · requer ${TECH_BY_ID[t.requires].name}` : ''}</div></div>${btn}</div>`;
+          })
+          .join('')}
+      </div>
+    </div>`;
   }
 
   function lutador(p: Player): string {
@@ -368,20 +376,41 @@ export function startApp(root: HTMLElement) {
     const gb = gearBonus(p);
     const cs = combatStats(p);
     const slots = deckSlots(p.level);
-    return `
-    <div class="grid2">
-      <div class="card">
-        <div class="look">${img(wearName(bodyOf(p), p.equipped), 'look-img', 'Seu personagem com o equipamento')}</div>
-        <h2>Atributos</h2>
-        <table class="attrs">
-          ${ATTRS.map(
-            (k) => `<tr><td>${ATTR_LABEL[k]}</td><td class="num">${Math.floor(eff[k])}</td><td class="tiny muted">${Math.floor(p.attrs[k])} treino${gb[k] ? ` + ${gb[k]} equip.` : ''}</td></tr>`,
-          ).join('')}
-        </table>
+    const view = curSub('lutador', 'atributos');
+    let body: string;
+    if (view === 'atributos') {
+      body = `
+      <div class="pane">
+        <div class="sheet">
+          <div class="look">${img(wearName(bodyOf(p), p.equipped), 'look-img', 'Seu personagem com o equipamento')}</div>
+          <table class="attrs">
+            ${ATTRS.map(
+              (k) => `<tr><td>${ATTR_LABEL[k]}</td><td class="num">${Math.floor(eff[k])}</td><td class="tiny muted">${gb[k] ? `+${gb[k]}` : ''}</td></tr>`,
+            ).join('')}
+          </table>
+        </div>
         <p class="tiny muted">Na luta: vida ${cs.maxHp} · fôlego ${cs.maxSta} · dano x${cs.dmgMult.toFixed(2)} · esquiva ${Math.round(cs.dodge * 100)}% · crítico ${Math.round(cs.crit * 100)}%${
-          cs.specialist ? ' · <b>Especialista</b> (deck só da arte principal: +10% dano e vida)' : ''
+          cs.specialist ? ' · <b>Especialista</b> (+10% dano e vida)' : ''
         }</p>
-        <h2>Equipamento</h2>
+      </div>`;
+    } else if (view === 'deck') {
+      body = `
+      <p class="tiny muted">Deck ${p.deck.length}/${slots}. A luta é automática e usa só o deck. Mais espaços nos níveis 3, 8, 15, 25 e 40.</p>
+      <div class="pane">
+        <div class="list">
+          ${p.techniques
+            .map((id) => TECH_BY_ID[id])
+            .map(
+              (t) => `<div class="row ${p.deck.includes(t.id) ? 'in-deck' : ''}"><div><b>${t.name}</b> <span class="tag ${t.kind}">${t.kind}</span>
+                <div class="tiny muted"><span style="color:${ARTS[t.art].color}">${ARTS[t.art].name}</span> · ${techLine(t)}</div></div>
+                <button data-act="deck" data-arg="${t.id}">${p.deck.includes(t.id) ? 'Tirar' : 'Usar'}</button></div>`,
+            )
+            .join('')}
+        </div>
+      </div>`;
+    } else {
+      body = `
+      <div class="pane">
         ${(['luvas', 'shorts', 'protetor'] as Slot[])
           .map((slot) => {
             const owned = p.inventory.filter((id) => GEAR_BY_ID[id].slot === slot);
@@ -390,37 +419,24 @@ export function startApp(root: HTMLElement) {
                 ? owned
                     .map((id) => `<button class="chip ${p.equipped[slot] === id ? 'on' : ''}" data-act="equip" data-arg="${id}">${GEAR_BY_ID[id].name}</button>`)
                     .join('')
-                : '<span class="tiny muted">Nada ainda — veja a Loja.</span>'
+                : '<span class="tiny muted">Nada ainda. Veja a Loja.</span>'
             }</div>`;
           })
           .join('')}
-      </div>
-      <div class="card">
-        <h2>Deck de luta (${p.deck.length}/${slots})</h2>
-        <p class="muted small">A luta é automática: seu lutador usa só as técnicas do deck. Mais espaços nos níveis 3, 8, 15, 25 e 40.</p>
-        <div class="list">
-          ${p.techniques
-            .map((id) => TECH_BY_ID[id])
-            .map(
-              (t) => `<div class="row ${p.deck.includes(t.id) ? 'in-deck' : ''}"><div><b>${t.name}</b> <span class="tag ${t.kind}">${t.kind}</span>
-                <span class="tiny" style="color:${ARTS[t.art].color}">${ARTS[t.art].name}</span><div class="tiny muted">${techLine(t)}</div></div>
-                <button data-act="deck" data-arg="${t.id}">${p.deck.includes(t.id) ? 'Tirar' : 'Usar'}</button></div>`,
-            )
-            .join('')}
-        </div>
-      </div>
-    </div>`;
+      </div>`;
+    }
+    return subtabs('lutador', [['atributos', 'Atributos'], ['deck', `Deck ${p.deck.length}/${slots}`], ['equip', 'Equipamento']], 'atributos') + body;
   }
 
   function loja(p: Player): string {
-    return `
-    ${scene('bg_loja', poseImg(bodyOf(p), 'loja', 'pose breathe'), 'room')}
-    <div class="card">
-      <h2>Equipamentos</h2>
-      <div class="host">${img('dono_loja', 'host-img')}<p class="muted small">Bônus somado dos equipamentos limitado a +15 por atributo: quem treina ainda vence quem só compra.</p></div>
-      ${(['luvas', 'shorts', 'protetor'] as Slot[])
-        .map(
-          (slot) => `<div class="field-label">${SLOT_LABEL[slot]}</div><div class="shop">${GEAR.filter((g) => g.slot === slot)
+    const view = curSub('loja', 'luvas');
+    const tiles =
+      view === 'sup'
+        ? `<div class="tile">${img('whey', 'tile-img')}<b>Whey</b><small>Próximos ${BALANCE.wheyCharges} treinos +${BALANCE.wheyBonus * 100}%</small>
+            <button data-act="whey" ${p.money < BALANCE.wheyPrice ? 'disabled' : ''}>${ic('coin', 14)} ${BALANCE.wheyPrice}</button></div>
+           <div class="tile">${img('energetico', 'tile-img')}<b>Energético</b><small>+${BALANCE.energyDrinkAmount} de energia</small>
+            <button data-act="drink" ${p.gold < BALANCE.energyDrinkGold ? 'disabled' : ''}>${ic('gold', 14)} ${BALANCE.energyDrinkGold}</button></div>`
+        : GEAR.filter((g) => g.slot === view)
             .map((g) => {
               const owned = p.inventory.includes(g.id);
               const cost = g.currency === 'moedas' ? `${ic('coin', 14)} ${g.price}` : `${ic('gold', 14)} ${g.price}`;
@@ -430,25 +446,17 @@ export function startApp(root: HTMLElement) {
                 : p.level < g.minLevel
                   ? `<button disabled>Nível ${g.minLevel}</button>`
                   : `<button data-act="buy" data-arg="${g.id}" ${can ? '' : 'disabled'}>${cost}</button>`;
-              return `<div class="item r-${g.rarity}">${img(GEAR_IMG[g.id], 'gear-img') || `<span class="swatch-sm" style="background:${g.color}"></span>`}<b>${g.name}</b>
-                <span class="tiny">${RARITY_LABEL[g.rarity]}</span>
-                <span class="tiny muted">${Object.entries(g.bonus)
+              return `<div class="tile item r-${g.rarity}">${img(GEAR_IMG[g.id], 'tile-img') || `<span class="swatch-sm" style="background:${g.color}"></span>`}<b>${g.name}</b>
+                <small>${RARITY_LABEL[g.rarity]} · ${Object.entries(g.bonus)
                   .map(([k, v]) => `+${v} ${ATTR_LABEL[k as keyof typeof ATTR_LABEL]}`)
-                  .join(' · ')}</span>${btn}</div>`;
+                  .join(' · ')}</small>${btn}</div>`;
             })
-            .join('')}</div>`,
-        )
-        .join('')}
-    </div>
-    <div class="card">
-      <h2>Suplementos</h2>
-      <div class="list">
-        <div class="row">${img('whey', 'row-img')}<div><b>Whey</b><div class="tiny muted">Próximos ${BALANCE.wheyCharges} treinos rendem +${BALANCE.wheyBonus * 100}%.</div></div>
-          <button data-act="whey" ${p.money < BALANCE.wheyPrice ? 'disabled' : ''}>${ic('coin', 14)} ${BALANCE.wheyPrice}</button></div>
-        <div class="row">${img('energetico', 'row-img')}<div><b>Energético</b><div class="tiny muted">+${BALANCE.energyDrinkAmount} de energia na hora.</div></div>
-          <button data-act="drink" ${p.gold < BALANCE.energyDrinkGold ? 'disabled' : ''}>${ic('gold', 14)} ${BALANCE.energyDrinkGold}</button></div>
-      </div>
-    </div>`;
+            .join('');
+    return `
+    ${scene('bg_loja', poseImg(bodyOf(p), 'loja', 'pose breathe'), 'room short')}
+    ${subtabs('loja', [['luvas', 'Luvas'], ['shorts', 'Shorts'], ['protetor', 'Protetor'], ['sup', 'Suplem.']], 'luvas')}
+    <div class="pane"><div class="tiles">${tiles}</div>
+      ${view !== 'sup' ? '<p class="tiny muted">Bônus somado dos equipamentos limitado a +15 por atributo.</p>' : ''}</div>`;
   }
 
   function lutar(p: Player): string {
@@ -462,54 +470,61 @@ export function startApp(root: HTMLElement) {
     const nextDiv = DIVISIONS.find((d) => d.min > p.rankPoints);
     const prize = (r: { money: number; gold: number }) => `${ic('coin', 14)} ${r.money}${r.gold ? ` + ${ic('gold', 14)} ${r.gold}` : ''}`;
     const last = p.lastSeason;
-    return `
-    <div class="card">
-      <div class="host">${img('cinturao', 'host-img belt')}<div>
-      <h2>Ranking PvP — temporada ${new Date(t).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</h2>
-      <p><span class="div" style="--c:${div.color}">${div.name}</span> ${p.rankPoints} pts ${nextDiv ? `· faltam ${nextDiv.min - p.rankPoints} para ${nextDiv.name}` : '· topo!'}</p>
-      <p class="small">Termina em ${fmtDuration(seasonEndsAt(t) - t)}. ${img('bau', 'inline-img')} Prêmio se terminar agora: ${prize(div.reward)}. Na virada você mantém ${SEASON_KEEP * 100}% dos pontos.</p>
-      </div></div>
-      ${last ? `<p class="tiny muted">${img('bau', 'inline-img')} Temporada passada (${last.season}): ${last.division} com ${last.points} pts · ganhou ${prize(last)}.</p>` : ''}
-      <p class="muted small">Só aparecem oponentes até ±${BALANCE.levelRange} níveis do seu. Vitória: +25 pts (mais se o oponente for de nível maior). Derrota: −15 pts, mas você ganha XP e moedas igual.
-      Cada luta gasta ${BALANCE.fightEnergy} de energia e ${BALANCE.fightSatiety} de saciedade.</p>
-      <p class="tiny muted">Protótipo: os oponentes são "fantasmas" gerados pelo jogo. Na versão online serão personagens de outros jogadores.</p>
-    </div>
-    <div class="opps">
-      ${opponents
-        .map((o, i) => {
-          const eff = effectiveAttrs(o);
-          const power = Math.round(ATTRS.reduce((s, k) => s + eff[k], 0));
-          const mine = Math.round(ATTRS.reduce((s, k) => s + effectiveAttrs(p)[k], 0));
-          return `<div class="card opp">
-            ${img(o.sprite === 'rival' ? 'rival_guarda' : o.sprite, 'opp-img', `${o.name} "${o.nickname}"`) || `<canvas data-portrait="opp${i}" width="120" height="160"></canvas>`}
-            <b>${esc(o.name)} "${esc(o.nickname)}"</b>
-            <div class="small">Nível ${o.level} · <span style="color:${ARTS[o.art].color}">${ARTS[o.art].name}</span></div>
-            <div class="tiny muted">Poder ${power} (você: ${mine})</div>
-            <button class="primary" data-act="fight" data-arg="${i}" ${p.energy < BALANCE.fightEnergy ? 'disabled' : ''}>Lutar</button>
-          </div>`;
-        })
-        .join('')}
-    </div>
-    <div class="card">
-      <h2>Últimas lutas</h2>
-      ${
-        p.history.length
-          ? `<div class="list">${p.history
-              .map(
-                (h) => `<div class="row"><div><b class="${h.won ? 'good' : 'bad'}">${h.won ? 'Vitória' : 'Derrota'}</b> vs ${esc(h.opponent)} (nv ${h.opponentLevel})</div>
-                <span class="${h.rankDelta >= 0 ? 'good' : 'bad'}">${h.rankDelta >= 0 ? '+' : ''}${h.rankDelta} pts</span></div>`,
-              )
-              .join('')}</div>`
-          : '<p class="muted small">Nenhuma luta ainda.</p>'
-      }
-    </div>`;
+    const view = curSub('lutar', 'oponentes');
+    const rankLine = `<div class="rank-line">${img('cinturao', 'rank-belt')}<div><b><span class="div" style="--c:${div.color}">${div.name}</span> ${p.rankPoints} pts</b>
+      <div class="tiny muted">${nextDiv ? `faltam ${nextDiv.min - p.rankPoints} para ${nextDiv.name}` : 'topo!'} · ${BALANCE.fightEnergy} de energia por luta</div></div></div>`;
+    let body: string;
+    if (view === 'oponentes') {
+      const mine = Math.round(ATTRS.reduce((s, k) => s + effectiveAttrs(p)[k], 0));
+      body = `${rankLine}
+      <div class="pane">
+        <div class="opps">
+          ${opponents
+            .map((o, i) => {
+              const eff = effectiveAttrs(o);
+              const power = Math.round(ATTRS.reduce((s, k) => s + eff[k], 0));
+              return `<div class="opp">
+                ${img(o.sprite === 'rival' ? 'rival_guarda' : o.sprite, 'opp-img', `${o.name} "${o.nickname}"`) || `<canvas data-portrait="opp${i}" width="120" height="160"></canvas>`}
+                <b>${esc(o.nickname)}</b>
+                <small>Nv ${o.level} · <span style="color:${ARTS[o.art].color}">${ARTS[o.art].name}</span></small>
+                <small class="muted">Poder ${power} <span class="${power > mine ? 'bad' : 'good'}">(${mine})</span></small>
+                <button class="primary" data-act="fight" data-arg="${i}" ${p.energy < BALANCE.fightEnergy ? 'disabled' : ''}>Lutar</button>
+              </div>`;
+            })
+            .join('')}
+        </div>
+      </div>`;
+    } else if (view === 'ranking') {
+      body = `
+      <div class="pane">
+        ${rankLine}
+        <p class="small">Temporada de ${new Date(t).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' })}: termina em ${fmtDuration(seasonEndsAt(t) - t)}.</p>
+        <p class="small">${img('bau', 'inline-img')} Prêmio se terminar agora: ${prize(div.reward)}. Na virada você mantém ${SEASON_KEEP * 100}% dos pontos.</p>
+        ${last ? `<p class="tiny muted">Temporada passada (${last.season}): ${last.division} com ${last.points} pts · ganhou ${prize(last)}.</p>` : ''}
+        <p class="tiny muted">Vitória: +25 pts (mais contra nível maior). Derrota: −15 pts, mas você ganha XP e moedas igual. Oponentes até ±${BALANCE.levelRange} níveis.</p>
+      </div>`;
+    } else {
+      body = `
+      <div class="pane">
+        ${
+          p.history.length
+            ? `<div class="list">${p.history
+                .map(
+                  (h) => `<div class="row"><div><b class="${h.won ? 'good' : 'bad'}">${h.won ? 'Vitória' : 'Derrota'}</b> <span class="tiny">vs ${esc(h.opponent)} (nv ${h.opponentLevel})</span></div>
+                  <span class="${h.rankDelta >= 0 ? 'good' : 'bad'}">${h.rankDelta >= 0 ? '+' : ''}${h.rankDelta}</span></div>`,
+                )
+                .join('')}</div>`
+            : '<p class="muted small">Nenhuma luta ainda.</p>'
+        }
+      </div>`;
+    }
+    return subtabs('lutar', [['oponentes', 'Oponentes'], ['ranking', 'Ranking'], ['historico', 'Histórico']], 'oponentes') + body;
   }
 
   function missoes(p: Player): string {
     return `
-    <div class="card">
-      <h2>Missões diárias</h2>
-      <p class="muted small">Renovam todo dia à meia-noite (UTC no protótipo).</p>
+    <p class="tiny muted">Renovam todo dia à meia-noite (UTC no protótipo).</p>
+    <div class="pane">
       <div class="list">
         ${MISSIONS.map((m) => {
           const st = p.missions[m.id] ?? { progress: 0, claimed: false };
@@ -524,56 +539,62 @@ export function startApp(root: HTMLElement) {
 
   function vip(p: Player): string {
     const t = now();
-    return `
-    <div class="grid2">
-      <div class="card">
-        <h2>VIP mensal</h2>
-        <ul class="benefits">
-          <li>Energia máxima ${BALANCE.vipMaxEnergy} (normal ${BALANCE.maxEnergy}) → mais lutas por dia</li>
-          <li>Energia recarrega a cada ${BALANCE.vipEnergyRegenMin} min (normal ${BALANCE.energyRegenMin} min)</li>
+    const view = curSub('vip', 'vip');
+    const body =
+      view === 'vip'
+        ? `
+      <div class="pane">
+        <div class="host">${img('icone_vip', 'host-img belt')}<ul class="benefits">
+          <li>Energia máxima ${BALANCE.vipMaxEnergy} (normal ${BALANCE.maxEnergy})</li>
+          <li>Recarrega a cada ${BALANCE.vipEnergyRegenMin} min (normal ${BALANCE.energyRegenMin})</li>
           <li>+${BALANCE.vipBonus * 100}% de XP, treino e moedas nas lutas</li>
-          <li>Selo VIP no nome (visuais exclusivos virão por temporada)</li>
-        </ul>
-        ${isVip(p, t) ? `<p class="good">VIP ativo — vence em ${fmtDuration(p.vipUntil - t)}</p>` : ''}
-        <button class="primary" data-act="vip" ${p.gold < BALANCE.vipGoldPrice ? 'disabled' : ''}>${isVip(p, t) ? 'Renovar' : 'Ativar'} ${BALANCE.vipDays} dias · ${ic('gold', 14)} ${BALANCE.vipGoldPrice}</button>
-      </div>
-      <div class="card">
-        <h2>Comprar ouro ${ic('gold', 14)}</h2>
-        <p class="muted small">No jogo online, estes pacotes serão pagos com dinheiro real. Aqui no protótipo a compra é simulada e gratuita.</p>
+          <li>Selo VIP no nome</li>
+        </ul></div>
+        ${isVip(p, t) ? `<p class="good">VIP ativo, vence em ${fmtDuration(p.vipUntil - t)}</p>` : ''}
+        <button class="primary wide" data-act="vip" ${p.gold < BALANCE.vipGoldPrice ? 'disabled' : ''}>${isVip(p, t) ? 'Renovar' : 'Ativar'} ${BALANCE.vipDays} dias · ${ic('gold', 14)} ${BALANCE.vipGoldPrice}</button>
+      </div>`
+        : `
+      <div class="pane">
+        <p class="tiny muted">No jogo online estes pacotes serão pagos com dinheiro real. Aqui a compra é simulada e gratuita.</p>
         <div class="list">
           ${[
             [50, 'R$ 4,90'],
             [120, 'R$ 9,90'],
             [300, 'R$ 19,90'],
           ]
-            .map(([g, price]) => `<div class="row"><b>${ic('gold', 14)} ${g}</b><button data-act="gold" data-arg="${g}">${price} (simulado)</button></div>`)
+            .map(([g, price]) => `<div class="row"><b>${ic('gold', 18)} ${g}</b><button data-act="gold" data-arg="${g}">${price} (simulado)</button></div>`)
             .join('')}
         </div>
-      </div>
+      </div>`;
+    return subtabs('vip', [['vip', 'VIP mensal'], ['ouro', 'Comprar ouro']], 'vip') + body;
+  }
+
+  function devMenu(): string {
+    if (!devOpen) return '';
+    return `<div class="dev" role="menu">
+      <b>Modo teste · v0.3</b>
+      <button data-act="skip" data-arg="1">Avançar 1h</button>
+      <button data-act="skip" data-arg="6">Avançar 6h</button>
+      <button data-act="reset" class="danger">${confirmReset ? 'Confirmar: apagar tudo?' : 'Apagar personagem'}</button>
+      ${confirmReset ? '<button data-act="cancelreset">Cancelar</button>' : ''}
     </div>`;
   }
 
   function gameView(p: Player): string {
     const views: Record<Tab, (p: Player) => string> = { casa, academia, mestres, lutador, trabalho, loja, lutar, missoes, vip };
+    const title = tab === 'lutador' ? (bodyOf(p) === 'f' ? 'Sua lutadora' : 'Seu lutador') : tab ? PANEL_TITLE[tab] : '';
     const body = tab
       ? `<section class="panel">
-          <div class="panel-head"><button class="back" data-act="home" aria-label="Voltar">${ic('back', 14)}</button><h1>${ic(MENU[tab].icon, 26)} ${PANEL_TITLE[tab]}</h1></div>
-          ${views[tab](p)}
+          <div class="panel-head"><button class="back" data-act="home" aria-label="Voltar">${ic('back', 14)}</button><h1>${ic(MENU[tab].icon, 24)} ${title}</h1></div>
+          <div class="panel-body">${views[tab](p)}</div>
         </section>`
       : home(p);
     return `
     <header class="hud" id="hud">${hud(p)}</header>
-    ${toast && Date.now() - toast.at < 6000 ? `<div class="toast ${toast.ok ? 'ok' : 'err'}" role="status">${esc(toast.msg)}</div>` : ''}
-    <main>${body}</main>
+    ${devMenu()}
+    <main>${body}${toast && Date.now() - toast.at < 4000 ? `<div class="toast ${toast.ok ? 'ok' : 'err'}" role="status">${esc(toast.msg)}</div>` : ''}</main>
     ${tabBar()}
-    ${noticeView(p)}
-    <footer class="dev">
-      <span>Protótipo v0.2 · modo teste</span>
-      <button data-act="skip" data-arg="1">Avançar 1h</button>
-      <button data-act="skip" data-arg="6">Avançar 6h</button>
-      <button data-act="reset" class="danger">${confirmReset ? 'Confirmar: apagar tudo?' : 'Apagar personagem'}</button>
-      ${confirmReset ? '<button data-act="cancelreset">Cancelar</button>' : ''}
-    </footer>`;
+    ${noticeView(p)}`;
   }
 
   function drawPortraits() {
@@ -679,6 +700,17 @@ export function startApp(root: HTMLElement) {
         if (r.ok) casaPose = 'dormindo';
         return run(r);
       }
+      case 'sub': {
+        const [tb, k] = arg.split(':');
+        sub[tb as Tab] = k;
+        render();
+        return;
+      }
+      case 'dev':
+        devOpen = !devOpen;
+        confirmReset = false;
+        render();
+        return;
       case 'closenotice':
         notice = null;
         render();
