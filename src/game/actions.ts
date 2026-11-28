@@ -6,6 +6,7 @@ import {
   FOODS,
   GEAR_BY_ID,
   GYMS,
+  JOBS,
   MISSIONS,
   OFF_ART_PRICE,
   STATIONS,
@@ -142,6 +143,27 @@ export function sleep(p: Player, now: number): Result {
   p.energy = Math.min(maxEnergy(p, now), p.energy + BALANCE.sleepEnergy);
   p.lastSleep = now;
   return ok(`Dormiu bem: +${BALANCE.sleepEnergy} de energia.`);
+}
+
+export function jobPay(level: number, jobId: string): number {
+  const job = JOBS.find((j) => j.id === jobId);
+  if (!job) return 0;
+  return Math.round(job.energy * (job.rate + level * BALANCE.jobPayPerLevel));
+}
+
+/** Bico: gasta energia e saciedade, paga moedas. Não dá XP nem bônus VIP. */
+export function work(p: Player, jobId: string, now: number): Result {
+  tick(p, now);
+  const job = JOBS.find((j) => j.id === jobId);
+  if (!job) return fail('Esse trabalho não existe.');
+  if (p.level < job.minLevel) return fail(`Precisa do nível ${job.minLevel}.`);
+  if (p.energy < job.energy) return fail('Sem energia para trabalhar.');
+  if (p.satiety <= 0) return fail('Você está com muita fome para trabalhar. Coma algo.');
+  const pay = jobPay(p.level, job.id);
+  p.energy -= job.energy;
+  p.satiety = Math.max(0, p.satiety - job.satiety);
+  p.money += pay;
+  return ok(`${job.name}: +${pay} moedas.`);
 }
 
 export function techPrice(p: Player, t: Technique): number {

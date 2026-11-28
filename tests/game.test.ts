@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BALANCE, TECHNIQUES } from '../src/game/data';
+import { BALANCE, JOBS, TECHNIQUES } from '../src/game/data';
 import { simulateFight } from '../src/game/fight';
 import { makeOpponent } from '../src/game/opponents';
 import { createPlayer, deckSlots, effectiveAttrs, xpToNext } from '../src/game/state';
@@ -138,5 +138,44 @@ describe('luta', () => {
     expect(r.ok).toBe(true);
     expect(p.wins + p.losses).toBe(1);
     expect(p.energy).toBe(BALANCE.maxEnergy - BALANCE.fightEnergy);
+  });
+});
+
+describe('trabalho', () => {
+  it('troca energia e saciedade por moedas, sem XP', () => {
+    const p = newPlayer();
+    const r = A.work(p, 'lanchonete', T0);
+    expect(r.ok).toBe(true);
+    expect(p.money).toBe(BALANCE.startMoney + A.jobPay(1, 'lanchonete'));
+    expect(p.energy).toBe(BALANCE.maxEnergy - JOBS[0].energy);
+    expect(p.satiety).toBe(70 - JOBS[0].satiety);
+    expect(p.xp).toBe(0);
+  });
+  it('exige nível, energia e comida', () => {
+    const p = newPlayer();
+    expect(A.work(p, 'seguranca', T0).ok).toBe(false);
+    p.energy = 5;
+    expect(A.work(p, 'lanchonete', T0).ok).toBe(false);
+    p.energy = 100;
+    p.satiety = 0;
+    expect(A.work(p, 'lanchonete', T0).ok).toBe(false);
+  });
+  it('rende mais que perder, mas menos que a média de lutar (50% de vitórias)', () => {
+    for (let lvl = 1; lvl <= BALANCE.maxLevel; lvl++) {
+      const win = 30 + 5 * lvl;
+      const avgFight = (win + 10) / 2 / BALANCE.fightEnergy;
+      const loss = 10 / BALANCE.fightEnergy;
+      for (const j of JOBS.filter((j) => j.minLevel <= lvl)) {
+        const perEnergy = A.jobPay(lvl, j.id) / j.energy;
+        expect(perEnergy).toBeGreaterThan(loss);
+        expect(perEnergy).toBeLessThan(avgFight * 0.7);
+      }
+    }
+  });
+  it('bicos de nível maior pagam mais por energia', () => {
+    for (let i = 1; i < JOBS.length; i++) {
+      const lvl = JOBS[i].minLevel;
+      expect(A.jobPay(lvl, JOBS[i].id) / JOBS[i].energy).toBeGreaterThan(A.jobPay(lvl, JOBS[i - 1].id) / JOBS[i - 1].energy);
+    }
   });
 });

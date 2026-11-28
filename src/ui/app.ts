@@ -10,6 +10,7 @@ import {
   GEAR,
   GEAR_BY_ID,
   GYMS,
+  JOBS,
   HAIR_COLORS,
   HAIR_STYLES,
   MISSIONS,
@@ -46,11 +47,12 @@ import { esc, fmtDuration, pct } from './util';
 const SAVE_KEY = 'lona.save.v1';
 const CLOCK_KEY = 'lona.clock.v1';
 
-type Tab = 'casa' | 'academia' | 'mestres' | 'lutador' | 'loja' | 'lutar' | 'missoes' | 'vip';
+type Tab = 'casa' | 'academia' | 'mestres' | 'lutador' | 'trabalho' | 'loja' | 'lutar' | 'missoes' | 'vip';
 const MENU: Record<Tab, { label: string; icon: string; hint: string }> = {
   academia: { label: 'Treinar', icon: 'train', hint: 'Suba seus atributos' },
   mestres: { label: 'Mestres', icon: 'master', hint: 'Aprenda técnicas' },
   lutador: { label: 'Lutador', icon: 'fighter', hint: 'Deck e equipamento' },
+  trabalho: { label: 'Trabalho', icon: 'work', hint: 'Bicos por moedas' },
   casa: { label: 'Casa', icon: 'home', hint: 'Comer e dormir' },
   loja: { label: 'Loja', icon: 'shop', hint: 'Luvas, shorts, protetor' },
   missoes: { label: 'Missões', icon: 'missions', hint: 'Recompensas do dia' },
@@ -61,6 +63,7 @@ const PANEL_TITLE: Record<Tab, string> = {
   academia: 'Academia',
   mestres: 'Mestres',
   lutador: 'Seu lutador',
+  trabalho: 'Trabalho',
   casa: 'Casa',
   loja: 'Loja',
   missoes: 'Missões diárias',
@@ -202,7 +205,7 @@ export function startApp(root: HTMLElement) {
   }
 
   function home(p: Player): string {
-    const left: Tab[] = ['academia', 'mestres', 'lutador'];
+    const left: Tab[] = ['academia', 'mestres', 'lutador', 'trabalho'];
     const right: Tab[] = ['casa', 'loja', 'missoes', 'vip'];
     const missionsReady = MISSIONS.some((m) => (p.missions[m.id]?.progress ?? 0) >= m.goal && !p.missions[m.id]?.claimed);
     const btn = (id: Tab) =>
@@ -241,6 +244,23 @@ export function startApp(root: HTMLElement) {
               <button data-act="eat" data-arg="${f.id}" ${p.money < f.price ? 'disabled' : ''}>${ic('coin', 14)} ${f.price}</button></div>`,
           ).join('')}
         </div>
+      </div>
+    </div>`;
+  }
+
+  function trabalho(p: Player): string {
+    return `
+    <div class="card">
+      <h2>Bicos</h2>
+      <p class="muted small">Trabalhar troca energia por moedas, sem XP. Rende menos que lutar, mas é dinheiro garantido quando a fase está difícil.</p>
+      <div class="list">
+        ${JOBS.map((j) => {
+          const btn =
+            p.level < j.minLevel
+              ? `<button disabled>Nível ${j.minLevel}</button>`
+              : `<button data-act="work" data-arg="${j.id}" ${p.energy < j.energy ? 'disabled' : ''}>${ic('coin', 14)} +${A.jobPay(p.level, j.id)}</button>`;
+          return `<div class="row"><div><b>${j.name}</b><div class="tiny muted">${j.description} ${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
+        }).join('')}
       </div>
     </div>`;
   }
@@ -503,7 +523,7 @@ export function startApp(root: HTMLElement) {
   }
 
   function gameView(p: Player): string {
-    const views: Record<Tab, (p: Player) => string> = { casa, academia, mestres, lutador, loja, lutar, missoes, vip };
+    const views: Record<Tab, (p: Player) => string> = { casa, academia, mestres, lutador, trabalho, loja, lutar, missoes, vip };
     const body = tab
       ? `<section class="panel">
           <div class="panel-head"><button class="back" data-act="home">${ic('back', 14)} Menu</button><h1>${ic(MENU[tab].icon, 26)} ${PANEL_TITLE[tab]}</h1></div>
@@ -618,6 +638,8 @@ export function startApp(root: HTMLElement) {
         return;
       case 'train':
         return run(A.train(p, arg, t));
+      case 'work':
+        return run(A.work(p, arg, t));
       case 'eat':
         return run(A.eat(p, arg, t));
       case 'sleep':

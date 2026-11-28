@@ -165,8 +165,18 @@ Meta: todas entre 45% e 55%. Rodar com `npx vite-node tests/balance.ts`.
 ## 9. Economia
 
 ### 9.1 Moedas (comum)
-Entra por: vitórias (`30 + 5×nível`), derrotas (10), missões diárias, prêmios de temporada.
+Entra por: vitórias (`30 + 5×nível`), derrotas (10), trabalho, missões diárias, prêmios de temporada.
 Sai por: comida, academias, técnicas, equipamentos, whey.
+
+**Trabalho (bicos):** troca energia e saciedade por moedas, sem XP e sem bônus VIP. Pagamento =
+`energia × (taxa + 0,06 × nível)`. É a renda garantida de quem está perdendo, mas sempre rende menos de 70% das moedas
+por energia que a média de lutar (com 50% de vitórias), e mais do que só perder.
+
+| Bico | Nível | Energia | Saciedade | Taxa |
+|---|---|---|---|---|
+| Balcão da Lanchonete | 1 | 10 | 4 | 0,6 |
+| Entregas de Bicicleta | 6 | 20 | 10 | 0,7 |
+| Segurança de Show | 15 | 30 | 12 | 0,8 |
 
 Missões diárias: treine 3× (50), vença 2 lutas (80), faça 2 refeições (30).
 

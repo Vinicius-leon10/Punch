@@ -54,6 +54,10 @@ const ICONS: Record<string, Icon> = {
     rows: ['....aaaa', '......a.', '.....a..', '....aaaa', 'bbb.....', '..b.....', '.b......', 'bbb.....'],
     pal: { a: '#c9c6ff', b: '#8f8cc8' },
   },
+  work: {
+    rows: ['........', '..aaaa..', '..a..a..', 'bbbbbbbb', 'bccccccb', 'bbbddbbb', 'bccccccb', 'bbbbbbbb'],
+    pal: { a: '#5b3a22', b: '#8a5a32', c: '#b87b45', d: '#ffd23f' },
+  },
   back: {
     rows: ['...a....', '..aa....', '.aaaaaaa', 'aaaaaaaa', '.aaaaaaa', '..aa....', '...a....', '........'],
     pal: { a: '#ffffff' },

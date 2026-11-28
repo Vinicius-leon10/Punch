@@ -194,6 +194,27 @@ export const FOODS: Food[] = [
   { id: 'frango', name: 'Frango com Batata-doce', price: 60, satiety: 65 },
 ];
 
+/**
+ * Bicos: trocam energia por moedas, sem XP. Renda garantida para quem perde muito,
+ * mas sempre rende menos moedas por energia do que a média das lutas (ver tests/).
+ * Pagamento = energia × (rate + nível × BALANCE.jobPayPerLevel).
+ */
+export interface Job {
+  id: string;
+  name: string;
+  minLevel: number;
+  energy: number;
+  satiety: number;
+  rate: number;
+  description: string;
+}
+
+export const JOBS: Job[] = [
+  { id: 'lanchonete', name: 'Balcão da Lanchonete', minLevel: 1, energy: 10, satiety: 4, rate: 0.6, description: 'Servir pastel e caldo de cana no fim da tarde.' },
+  { id: 'entregas', name: 'Entregas de Bicicleta', minLevel: 6, energy: 20, satiety: 10, rate: 0.7, description: 'Rodar o bairro entregando marmitas.' },
+  { id: 'seguranca', name: 'Segurança de Show', minLevel: 15, energy: 30, satiety: 12, rate: 0.8, description: 'Cuidar da porta nos shows de sábado.' },
+];
+
 export type Slot = 'luvas' | 'shorts' | 'protetor';
 export const SLOT_LABEL: Record<Slot, string> = { luvas: 'Luvas', shorts: 'Shorts', protetor: 'Protetor bucal' };
 export type Rarity = 'comum' | 'raro' | 'epico' | 'lendario';
@@ -259,6 +280,8 @@ export const BALANCE = {
   energyDrinkAmount: 40,
   vipGoldPrice: 100,
   vipDays: 30,
+  /** Quanto cada nível soma ao pagamento por ponto de energia dos bicos. */
+  jobPayPerLevel: 0.06,
 };
 
 export interface Division {
