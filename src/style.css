@@ -1,3 +1,6 @@
+/* Fontes dentro do jogo (funcionam sem internet). Licença OFL: ver src/assets/fonts/LEIA-ME.md */
+@font-face { font-family: 'Lilita One'; font-style: normal; font-weight: 400; font-display: swap; src: url('./assets/fonts/lilita-one-latin.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 200 1000; font-display: swap; src: url('./assets/fonts/nunito-latin.woff2') format('woff2'); }
 /* LONA — estilo A "Arena Mobile": roxo profundo, botões amarelo-laranja com borda branca,
    cartões escuros translúcidos e barra de abas roxa embaixo. Fontes: Lilita One (títulos) e Nunito (texto). */
 :root {
@@ -449,3 +452,10 @@ button.big { margin-top: 10px; padding: 10px; font-size: 22px; }
   #app { height: min(100%, 900px); max-width: 430px; border: 3px solid #fff; border-radius: 34px; background: radial-gradient(700px 400px at 50% -120px, #3b1f86, transparent 70%), var(--page); box-shadow: 0 0 0 6px #050310, 0 30px 60px rgba(0, 0, 0, .6); }
   .tabs { border-radius: 22px 22px 30px 30px; }
 }
+
+/* Toque de app no iPhone: sem zoom ao tocar duas vezes, sem destaque cinza, sem selecionar texto dos botões */
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+button, .tab, .rb, .station, .tile { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+img { -webkit-user-drag: none; -webkit-touch-callout: none; }
+/* Safari amplia a tela ao focar campos com letra menor que 16px */
+input { font-size: 16px !important; }

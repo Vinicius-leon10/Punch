@@ -17,3 +17,7 @@ npx vite-node tests/balance.ts   # simulação de equilíbrio entre as artes
 ```
 
 No rodapé do jogo há um **modo teste** para avançar o relógio (recarregar energia) e apagar o personagem.
+
+## Jogar no iPhone
+
+O jogo é um app web instalável (funciona sem internet). Passo a passo em [docs/INSTALAR-IPHONE.md](docs/INSTALAR-IPHONE.md).
