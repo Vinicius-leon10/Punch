@@ -143,6 +143,29 @@ STYLE FOR ALL: 2D pixel art, retro 90s game look, chunky pixels, no anti-aliasin
 
 ---
 
+## LOTE 6B: trabalho, oponentes que faltaram e ícones das abas
+**Anexe:** `art/v1/01_protagonista_iniciante_homem.png`, `art/v1/12_dona_lanchonete.png`, `art/v7-lote6/oponente_1.png` e `art/v6-lotes3a5/icone_moedas.png`
+
+```
+Create 10 separate images. Each image must be its own transparent PNG file (real transparency, no checkerboard, no text, no labels), centered.
+
+STYLE FOR ALL: 2D pixel art, retro 90s game look, chunky pixels, no anti-aliasing, dark outline, warm gritty color palette. Match the style of the reference images exactly.
+PLAYER = the young male street fighter from the first reference image (messy black hair, white tank top, red shorts, hands wrapped in white tape, dark blue sneakers).
+
+1. oponente_2.png — street fighter, bald heavy man with a thick mustache, orange shorts, side view facing LEFT, guard stance, full body, same size and style as the opponent reference image
+2. oponente_3.png — street fighter, slim young man with a buzz cut and arm tattoos, blue shorts, side view facing LEFT, guard stance, full body, same size and style as the opponent reference image
+3. trabalho_lanchonete.png — PLAYER wearing a red apron over the tank top, behind the same brick and wood snack counter from the second reference image, three-quarter view, smiling and handing a plate of pastel to the viewer, waist up visible above the counter
+4. trabalho_entregas.png — PLAYER riding an old red bicycle with a square delivery box on the back, side view facing right, pedaling fast, full body with the whole bicycle
+5. trabalho_seguranca.png — PLAYER wearing a plain black t-shirt with no text or logo, arms crossed, serious face, standing in front of a closed door with a velvet rope, front view, full body
+6. icone_casa.png — square app icon of a small simple house with a red roof and a lit window
+7. icone_treinar.png — square app icon of a dumbbell
+8. icone_arena.png — square app icon of a red boxing glove
+9. icone_mestres.png — square app icon of a black martial arts belt tied in a knot
+10. icone_lutador.png — square app icon of a fighter's head and shoulders silhouette with a headband
+```
+
+---
+
 ## LOTE 7: oponentes e começo da versão feminina
 **Anexe:** `art/v1/02_protagonista_iniciante_mulher.png`
 
