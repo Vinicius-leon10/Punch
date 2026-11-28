@@ -2,16 +2,18 @@
 
 O LONA é um app web instalável: depois de instalado, abre pelo ícone na tela de início, em tela cheia, e funciona sem internet.
 
-## 1. Publicar o jogo na Netlify (uma vez só)
+## 1. Publicar o jogo no GitHub Pages (uma vez só)
 
-1. Entre em **app.netlify.com** e crie uma conta grátis (dá para entrar com o GitHub).
-2. Toque em **Add new site → Import an existing project → GitHub**.
-3. Autorize a Netlify a ver o repositório **Vinicius-leon10/Punch** (pode deixar só esse).
-4. Em **Branch to deploy**, escolha `claude/new-session-3yuxoc` (depois do merge, troque para `main`).
-5. Os outros campos já vêm do arquivo `netlify.toml` (build `npm ci && npm run build`, pasta `dist`). Toque em **Deploy**.
-6. Em 1 ou 2 minutos aparece o link, algo como `https://nome-aleatorio.netlify.app`. Em **Site configuration → Change site name** dá para trocar para `lona-jogo.netlify.app`, se estiver livre.
+O link do jogo é **https://vinicius-leon10.github.io/Punch/**. Para ele funcionar:
 
-Cada vez que o jogo for atualizado na branch, a Netlify publica a nova versão sozinha.
+1. No GitHub, abra o repositório **Punch → Settings → Pages**.
+2. Em **Build and deployment → Source**, escolha **GitHub Actions**.
+3. Abra a aba **Actions**, toque em **Publicar jogo (GitHub Pages)** → **Run workflow** (ou espere o próximo envio para a branch).
+4. Em 1 ou 2 minutos o link abre o jogo.
+
+Se a publicação falhar com a mensagem *"Branch ... is not allowed to deploy to github-pages"*: em **Settings → Environments → github-pages → Deployment branches**, adicione `claude/new-session-3yuxoc` (ou faça o merge na `main`, que já é permitida).
+
+Cada envio para a branch (ou para a `main`) publica a versão nova sozinho.
 
 ## 2. Instalar no iPhone
 
