@@ -214,7 +214,7 @@ STYLE FOR ALL: 2D pixel art, retro 90s game look, chunky pixels, no anti-aliasin
 
 ---
 
-## LOTE 9: versão feminina (dia a dia)
+## LOTE 9: versão feminina (dia a dia e trabalho)
 **Anexe:** `art/v1/02_protagonista_iniciante_mulher.png`
 
 ```
@@ -229,9 +229,10 @@ STYLE FOR ALL: 2D pixel art, retro 90s game look, chunky pixels, no anti-aliasin
 5. lona_f_comendo.png — three-quarter view, sitting at a small wooden table eating a plate of rice, beans and chicken
 6. lona_f_descansando.png — three-quarter view, sitting on the edge of a bed with a towel around the neck, drinking water
 7. lona_f_protetor.png — front view close-up, head and shoulders, smiling to show a white mouthguard, square image
+8. lona_f_trabalho_lanchonete.png — wearing a red apron over the sports top, behind a brick and wood snack counter, three-quarter view, smiling and handing a plate of pastel to the viewer, waist up visible above the counter
+9. lona_f_trabalho_entregas.png — riding an old red bicycle with a square delivery box on the back, side view facing right, pedaling fast, full body with the whole bicycle
+10. lona_f_trabalho_seguranca.png — wearing a plain black t-shirt with no text or logo, arms crossed, serious face, standing in front of a closed door with a velvet rope, front view, full body
 ```
-
-Sobram 3 vagas neste lote: dá para juntar com o próximo pedido.
 
 ---
 
