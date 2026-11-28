@@ -232,7 +232,6 @@ main { margin-top: 14px; }
   .stage-tag { top: 10px; }
   .menu { display: contents; }
   .mbtn { width: auto; min-width: 0; }
-  .menu-r .mbtn:last-child { grid-column: 1 / -1; }
   .fight-cta { position: relative; left: auto; bottom: auto; transform: none; order: -1; grid-column: 1 / -1; justify-self: center; margin: -34px 0 6px; }
   .fight-cta:active:not(:disabled) { transform: translateY(2px); }
   .hud-res { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
