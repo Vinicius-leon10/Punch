@@ -16,6 +16,8 @@ import {
 } from './data';
 
 export interface Appearance {
+  /** Corpo do personagem: lutador ("m") ou lutadora ("f"). Saves antigos sem o campo são lutador. */
+  body?: 'm' | 'f';
   skin: number;
   hairStyle: HairStyle;
   hairColor: number;

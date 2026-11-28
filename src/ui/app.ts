@@ -11,12 +11,9 @@ import {
   GEAR_BY_ID,
   GYMS,
   JOBS,
-  HAIR_COLORS,
-  HAIR_STYLES,
   MISSIONS,
   SEASON_KEEP,
   RARITY_LABEL,
-  SKIN_TONES,
   SLOT_LABEL,
   STATIONS,
   TECHNIQUES,
@@ -41,10 +38,9 @@ import {
   type Player,
 } from '../game/state';
 import { playFight } from './fightView';
-import { FOOD_IMG, GEAR_IMG, JOB_IMG, MASTER_IMG, STATION_IMG, img } from './art';
+import { FOOD_IMG, GEAR_IMG, MASTER_IMG, bodyOf, imgUrl, img, jobImg, poseImg, stationImg, wearName, type Body, type PoseKey } from './art';
 import { ic } from './icons';
-import { drawStreet } from './scene';
-import { avatar, portrait } from './sprite';
+import { portrait } from './sprite';
 import { esc, fmtDuration, pct } from './util';
 
 const SAVE_KEY = 'lona.save.v1';
@@ -103,7 +99,11 @@ export function startApp(root: HTMLElement) {
   }
 
   let tab: Tab | null = null;
-  let stageRaf = 0;
+  /** Pose da casa e aparelho da academia: mudam com a última ação, só na tela. */
+  let casaPose: PoseKey = 'descansando';
+  let gymStation = 'saco';
+  /** Aviso grande com a pose do personagem (nível, energia, fome, missão, resultado da luta). */
+  let notice: { title: string; pose: PoseKey; text: string; tone: 'good' | 'bad' } | null = null;
   let toast: { msg: string; ok: boolean; at: number } | null = null;
   let opponents: Fighter[] = [];
   let opponentsKey = '';
@@ -112,47 +112,48 @@ export function startApp(root: HTMLElement) {
     name: '',
     nickname: '',
     art: 'boxe',
-    appearance: { skin: 1, hairStyle: 'curto', hairColor: 0, beard: false, tattoo: false },
+    appearance: { body: 'm', skin: 1, hairStyle: 'curto', hairColor: 0, beard: false, tattoo: false },
   };
   const fightHost = document.createElement('div');
   document.body.appendChild(fightHost);
 
   const save = () => player && writeStore(SAVE_KEY, JSON.stringify(player));
 
+  const showEvent = (ev: A.GameEvent | undefined, p: Player, msg: string) => {
+    if (ev === 'nivel') notice = { title: 'SUBIU DE NÍVEL!', pose: 'nivel', text: `Nível ${p.level} · ${deckSlots(p.level)} espaços no deck`, tone: 'good' };
+    else if (ev === 'energia') notice = { title: 'SEM ENERGIA', pose: 'energia', text: `Volta +1 em ${fmtDuration(A.nextEnergyIn(p, now()))}. Durma na Casa ou use um energético.`, tone: 'bad' };
+    else if (ev === 'fome') notice = { title: 'COM FOME', pose: 'fome', text: 'Coma alguma coisa na Casa antes de continuar.', tone: 'bad' };
+    else if (ev === 'missao') notice = { title: 'MISSÃO CUMPRIDA!', pose: 'joinha', text: msg, tone: 'good' };
+  };
+
   const run = (r: A.Result) => {
     toast = { msg: r.msg, ok: r.ok, at: Date.now() };
+    if (player) showEvent(r.ev, player, r.msg);
     save();
     render();
   };
 
+  const scene = (bg: string, inner: string, cls = '') => `<div class="scene ${cls}" style="background-image:url('${imgUrl(bg)}')">${inner}</div>`;
+
+  function noticeView(p: Player): string {
+    if (!notice) return '';
+    const b = bodyOf(p);
+    return `<div class="notice-dim"><div class="notice ${notice.tone}" role="dialog" aria-labelledby="ntitle">
+      <div class="notice-title" id="ntitle">${esc(notice.title)}</div>
+      ${poseImg(b, notice.pose, 'notice-img')}
+      <p>${esc(notice.text)}</p>
+      <button class="primary" data-act="closenotice">Continuar</button>
+    </div></div>`;
+  }
+
   // ---------------- Criação ----------------
-  const previewFighter = (): Fighter => ({
-    name: draft.name,
-    nickname: draft.nickname || 'Novato',
-    art: draft.art,
-    level: 1,
-    attrs: { forca: 5, agilidade: 5, resistencia: 5, tecnica: 5, cardio: 5 },
-    techniques: [],
-    deck: [],
-    equipped: {},
-    appearance: draft.appearance,
-  });
-
-  const swatches = (field: 'skin' | 'hairColor', colors: string[]) =>
-    colors
-      .map(
-        (c, i) =>
-          `<button class="swatch ${draft.appearance[field] === i ? 'on' : ''}" style="background:${c}" data-act="look" data-arg="${field}:${i}" aria-label="Cor ${i + 1}"></button>`,
-      )
-      .join('');
-
   function createView(): string {
     return `
     <div class="create">
-      <header class="brand"><h1>LONA</h1><p>Do beco ao cinturão. Crie seu lutador.</p></header>
+      <header class="brand"><h1>LONA</h1><p>Do beco ao cinturão. Crie seu personagem.</p></header>
       <div class="create-grid">
         <div class="card preview-card">
-          <canvas data-portrait="preview" width="240" height="300"></canvas>
+          ${poseImg(draft.appearance.body ?? 'm', 'menu', 'preview-img', 'Prévia do personagem')}
           <div class="muted center">${esc(draft.nickname || 'Seu apelido')}</div>
         </div>
         <div class="card">
@@ -165,13 +166,14 @@ export function startApp(root: HTMLElement) {
                 <b>${ARTS[id].name}</b><small>${ARTS[id].description}</small></button>`,
             ).join('')}
           </div>
-          <div class="field-label">Pele</div><div class="swatches">${swatches('skin', SKIN_TONES)}</div>
-          <div class="field-label">Cabelo</div>
-          <div class="chips">${HAIR_STYLES.map((h) => `<button class="chip cap ${draft.appearance.hairStyle === h ? 'on' : ''}" data-act="look" data-arg="hairStyle:${h}">${h}</button>`).join('')}</div>
-          <div class="swatches">${swatches('hairColor', HAIR_COLORS)}</div>
-          <div class="chips">
-            <button class="chip ${draft.appearance.beard ? 'on' : ''}" data-act="look" data-arg="beard">Barba</button>
-            <button class="chip ${draft.appearance.tattoo ? 'on' : ''}" data-act="look" data-arg="tattoo">Tatuagem</button>
+          <div class="field-label">Personagem</div>
+          <div class="bodies">
+            ${(['m', 'f'] as Body[])
+              .map(
+                (bd) => `<button class="body-pick ${(draft.appearance.body ?? 'm') === bd ? 'on' : ''}" data-act="body" data-arg="${bd}" aria-pressed="${(draft.appearance.body ?? 'm') === bd}">
+                ${poseImg(bd, 'perfil', 'body-img')}<b>${bd === 'm' ? 'Lutador' : 'Lutadora'}</b></button>`,
+              )
+              .join('')}
           </div>
           <button class="primary big" data-act="create">Começar carreira</button>
           <p id="cerr" class="bad small" role="alert"></p>
@@ -190,7 +192,7 @@ export function startApp(root: HTMLElement) {
     const hungry = p.satiety < BALANCE.hungryThreshold;
     return `
     <div class="hud-id">
-      <div class="avatar"><canvas data-portrait="hud" width="56" height="56"></canvas><span class="lvl">${p.level}</span></div>
+      <div class="avatar">${poseImg(bodyOf(p), 'perfil', 'avatar-img')}<span class="lvl">${p.level}</span></div>
       <div class="hud-who">
         <div class="hud-name">${esc(p.nickname)} ${isVip(p, t) ? '<span class="vip">VIP</span>' : ''}</div>
         <div class="meter xp" title="XP ${p.xp}/${xpToNext(p.level)}"><span style="width:${pct(p.xp, xpToNext(p.level))}"></span></div>
@@ -223,7 +225,7 @@ export function startApp(root: HTMLElement) {
       }</span><small>${MENU[id].label}</small></button>`;
     return `
     <section class="stage">
-      <canvas id="stage" aria-label="${esc(p.nickname)} em frente à academia"></canvas>
+      ${scene('bg_rua', poseImg(bodyOf(p), 'menu', 'pose breathe', `${esc(p.nickname)} em guarda na rua`), 'street')}
       <div class="stage-tag"><b>${esc(p.nickname)}</b><small>${p.wins}V · ${p.losses}D</small></div>
       <nav class="quick">${QUICK.map(rb).join('')}</nav>
       <button class="fight-cta" data-act="tab" data-arg="lutar"><span>LUTAR</span><small>Partida ranqueada · ${BALANCE.fightEnergy} de energia</small></button>
@@ -247,7 +249,7 @@ export function startApp(root: HTMLElement) {
     <div class="grid2">
       <div class="card center">
         <h2>Sua casa</h2>
-        <canvas data-portrait="home" width="200" height="260"></canvas>
+        ${scene('bg_casa', poseImg(bodyOf(p), casaPose, `pose ${casaPose}`), 'room')}
         <p class="muted">${p.wins}V · ${p.losses}D</p>
         <button class="primary" data-act="sleep" ${t < sleepAt ? 'disabled' : ''}>${ic('sleep', 14)} Dormir (+${BALANCE.sleepEnergy} energia)</button>
         <p class="tiny muted">${t < sleepAt ? `Sono volta em ${fmtDuration(sleepAt - t)}` : `Pode dormir a cada ${BALANCE.sleepCooldownH}h`}</p>
@@ -276,7 +278,7 @@ export function startApp(root: HTMLElement) {
             p.level < j.minLevel
               ? `<button disabled>Nível ${j.minLevel}</button>`
               : `<button data-act="work" data-arg="${j.id}" ${p.energy < j.energy ? 'disabled' : ''}>${ic('coin', 14)} +${A.jobPay(p.level, j.id)}</button>`;
-          return `<div class="row">${img(JOB_IMG[j.id], 'row-img job')}<div><b>${j.name}</b><div class="tiny muted">${j.description} ${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
+          return `<div class="row">${img(jobImg(bodyOf(p), j.id), 'row-img job')}<div><b>${j.name}</b><div class="tiny muted">${j.description} ${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
         }).join('')}
       </div>
     </div>`;
@@ -286,6 +288,7 @@ export function startApp(root: HTMLElement) {
     const t = now();
     const gym = GYMS.find((g) => g.id === p.currentGym) ?? GYMS[0];
     return `
+    ${scene('bg_academia', img(stationImg(bodyOf(p), gymStation), 'pose train'), 'room')}
     <div class="card">
       <h2>${gym.name}</h2>
       <div class="host">${gym.id === 'bairro' ? img('retrato_neide', 'host-img', 'Dona Neide') : ''}<p class="muted small">${gym.id === 'bairro' ? '<b>Dona Neide</b>, dona da academia, cuida do seu treino. ' : ''}Cada treino gasta ${BALANCE.trainEnergy} de energia e ${BALANCE.trainSatiety} de saciedade, dá XP ao personagem e aumenta um atributo. Quanto mais alto o atributo, menos ele sobe por treino.
@@ -293,7 +296,7 @@ export function startApp(root: HTMLElement) {
       <div class="stations">
         ${STATIONS.map(
           (s) => `<button class="station" data-act="train" data-arg="${s.id}" ${p.energy < BALANCE.trainEnergy ? 'disabled' : ''}>
-            ${img(STATION_IMG[s.id], 'station-img')}<b>${s.name}</b><span>${ATTR_LABEL[s.attr]} ${Math.floor(p.attrs[s.attr])}</span></button>`,
+            ${img(stationImg(bodyOf(p), s.id), 'station-img')}<b>${s.name}</b><span>${ATTR_LABEL[s.attr]} ${Math.floor(p.attrs[s.attr])}</span></button>`,
         ).join('')}
       </div>
     </div>
@@ -331,7 +334,7 @@ export function startApp(root: HTMLElement) {
 
   function mestres(p: Player): string {
     const order = [p.art, ...ART_IDS.filter((a) => a !== p.art)];
-    return order
+    return `<div class="card"><div class="host">${poseImg(bodyOf(p), 'mestres', 'host-img')}<p class="muted small">Cumprimente o mestre e aprenda as técnicas. As da sua arte saem mais baratas e batem mais forte.</p></div></div>` + order
       .map(
         (art: ArtId) => `
       <div class="card">
@@ -368,6 +371,7 @@ export function startApp(root: HTMLElement) {
     return `
     <div class="grid2">
       <div class="card">
+        <div class="look">${img(wearName(bodyOf(p), p.equipped), 'look-img', 'Seu personagem com o equipamento')}</div>
         <h2>Atributos</h2>
         <table class="attrs">
           ${ATTRS.map(
@@ -410,6 +414,7 @@ export function startApp(root: HTMLElement) {
 
   function loja(p: Player): string {
     return `
+    ${scene('bg_loja', poseImg(bodyOf(p), 'loja', 'pose breathe'), 'room')}
     <div class="card">
       <h2>Equipamentos</h2>
       <div class="host">${img('dono_loja', 'host-img')}<p class="muted small">Bônus somado dos equipamentos limitado a +15 por atributo: quem treina ainda vence quem só compra.</p></div>
@@ -476,7 +481,7 @@ export function startApp(root: HTMLElement) {
           const power = Math.round(ATTRS.reduce((s, k) => s + eff[k], 0));
           const mine = Math.round(ATTRS.reduce((s, k) => s + effectiveAttrs(p)[k], 0));
           return `<div class="card opp">
-            ${img(o.sprite, 'opp-img', `${o.name} "${o.nickname}"`) || `<canvas data-portrait="opp${i}" width="120" height="160"></canvas>`}
+            ${img(o.sprite === 'rival' ? 'rival_guarda' : o.sprite, 'opp-img', `${o.name} "${o.nickname}"`) || `<canvas data-portrait="opp${i}" width="120" height="160"></canvas>`}
             <b>${esc(o.name)} "${esc(o.nickname)}"</b>
             <div class="small">Nível ${o.level} · <span style="color:${ARTS[o.art].color}">${ARTS[o.art].name}</span></div>
             <div class="tiny muted">Poder ${power} (você: ${mine})</div>
@@ -561,6 +566,7 @@ export function startApp(root: HTMLElement) {
     ${toast && Date.now() - toast.at < 6000 ? `<div class="toast ${toast.ok ? 'ok' : 'err'}" role="status">${esc(toast.msg)}</div>` : ''}
     <main>${body}</main>
     ${tabBar()}
+    ${noticeView(p)}
     <footer class="dev">
       <span>Protótipo v0.2 · modo teste</span>
       <button data-act="skip" data-arg="1">Avançar 1h</button>
@@ -570,34 +576,14 @@ export function startApp(root: HTMLElement) {
     </footer>`;
   }
 
-  function animateStage() {
-    cancelAnimationFrame(stageRaf);
-    const c = root.querySelector<HTMLCanvasElement>('#stage');
-    if (!c || !player) return;
-    const loop = (t: number) => {
-      if (!c.isConnected || !player) return;
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const w = Math.round(c.clientWidth * dpr);
-      const h = Math.round(c.clientHeight * dpr);
-      if (c.width !== w || c.height !== h) {
-        c.width = w;
-        c.height = h;
-      }
-      drawStreet(c, player, 'idle', t);
-      stageRaf = requestAnimationFrame(loop);
-    };
-    stageRaf = requestAnimationFrame(loop);
-  }
-
   function drawPortraits() {
     root.querySelectorAll<HTMLCanvasElement>('canvas[data-portrait]').forEach((c) => {
       const k = c.dataset.portrait!;
-      if (k === 'preview') portrait(c, previewFighter(), 'guard', performance.now());
-      else if (k.startsWith('opp')) {
+      // Só oponentes sem arte ainda usam o boneco desenhado em código.
+      if (k.startsWith('opp')) {
         const o = opponents[Number(k.slice(3))];
         if (o) portrait(c, o, 'guard');
-      } else if (player && k === 'hud') avatar(c, player);
-      else if (player) portrait(c, player, k === 'home' ? 'win' : 'idle');
+      }
     });
   }
 
@@ -620,7 +606,6 @@ export function startApp(root: HTMLElement) {
     if (player) tickPlayer(player);
     root.innerHTML = player ? gameView(player) : createView();
     drawPortraits();
-    animateStage();
   }
 
   // ---------------- Eventos ----------------
@@ -643,6 +628,7 @@ export function startApp(root: HTMLElement) {
 
     if (!player) {
       if (act === 'art') draft.art = arg as ArtId;
+      if (act === 'body') draft.appearance.body = arg === 'f' ? 'f' : 'm';
       if (act === 'look') {
         const [k, v] = arg.split(':');
         if (k === 'beard' || k === 'tattoo') draft.appearance[k] = !draft.appearance[k];
@@ -679,13 +665,24 @@ export function startApp(root: HTMLElement) {
         window.scrollTo({ top: 0 });
         return;
       case 'train':
+        gymStation = arg;
         return run(A.train(p, arg, t));
       case 'work':
         return run(A.work(p, arg, t));
-      case 'eat':
-        return run(A.eat(p, arg, t));
-      case 'sleep':
-        return run(A.sleep(p, t));
+      case 'eat': {
+        const r = A.eat(p, arg, t);
+        if (r.ok) casaPose = 'comendo';
+        return run(r);
+      }
+      case 'sleep': {
+        const r = A.sleep(p, t);
+        if (r.ok) casaPose = 'dormindo';
+        return run(r);
+      }
+      case 'closenotice':
+        notice = null;
+        render();
+        return;
       case 'gym':
         return run(A.selectGym(p, arg, t));
       case 'gympass':
@@ -713,11 +710,15 @@ export function startApp(root: HTMLElement) {
         if (!opp) return;
         const snapshot = JSON.parse(JSON.stringify(p)) as Player;
         const out = A.fight(p, opp, t);
-        if (!out.ok || !out.fight) return run({ ok: false, msg: out.msg });
+        if (!out.ok || !out.fight) return run({ ok: false, msg: out.msg, ev: out.ev });
         save();
         const extra = ` ${out.rankDelta! >= 0 ? '+' : ''}${out.rankDelta} pts de rank · +${out.xp} XP.`;
         playFight(fightHost, [snapshot, opp], out.fight, out.msg + extra, () => {
           toast = { msg: out.msg, ok: true, at: Date.now() };
+          const up = out.levels ? ` · Subiu para o nível ${p.level}!` : '';
+          notice = out.won
+            ? { title: 'VITÓRIA!', pose: 'vitoria', text: `+${out.rankDelta} pts · +${out.money} moedas · +${out.xp} XP${up}`, tone: 'good' }
+            : { title: 'DERROTA', pose: 'derrota', text: `${out.rankDelta} pts · +${out.money} moedas · +${out.xp} XP${up}`, tone: 'bad' };
           render();
         });
         return;
@@ -753,8 +754,6 @@ export function startApp(root: HTMLElement) {
     const el = root.querySelector('#hud');
     if (el) {
       el.innerHTML = hud(player);
-      const c = el.querySelector<HTMLCanvasElement>('canvas[data-portrait]');
-      if (c) avatar(c, player);
     }
   }, 1000);
 

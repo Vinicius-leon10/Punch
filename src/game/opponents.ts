@@ -6,7 +6,7 @@ const FIRST = ['Zé', 'Rafa', 'Bruno', 'Thiago', 'Duda', 'Leo', 'Marcão', 'Japa
 const WOMEN = new Set(['Lu', 'Carol', 'Bia', 'Rose', 'Dani', 'Fê']);
 /** Artes de oponente (art/v7-lote6 e art/v8-chatgpt), separadas para combinar com o nome. */
 export const OPPONENT_SPRITES = {
-  homem: ['oponente_1', 'oponente_2', 'oponente_3', 'oponente_5', 'oponente_6', 'oponente_8'],
+  homem: ['oponente_1', 'oponente_2', 'oponente_3', 'oponente_5', 'oponente_6', 'oponente_8', 'rival'],
   mulher: ['oponente_4', 'oponente_7'],
 };
 const NICK = ['Trovão', 'Furacão', 'Marreta', 'Pitbull', 'Sombra', 'Muralha', 'Navalha', 'Tanque', 'Cobra', 'Fera', 'Tsunami', 'Raio'];

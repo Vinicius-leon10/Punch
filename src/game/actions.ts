@@ -20,9 +20,11 @@ import { hashString } from './rng';
 import { makeOpponent } from './opponents';
 import { dayKey, deckSlots, division, freshMissions, isVip, maxEnergy, seasonKey, xpToNext, type Fighter, type Player } from './state';
 
-export type Result = { ok: true; msg: string } | { ok: false; msg: string };
-const ok = (msg: string): Result => ({ ok: true, msg });
-const fail = (msg: string): Result => ({ ok: false, msg });
+/** Momentos que a tela mostra com um aviso grande (pose do personagem). */
+export type GameEvent = 'nivel' | 'energia' | 'fome' | 'missao';
+export type Result = { ok: true; msg: string; ev?: GameEvent } | { ok: false; msg: string; ev?: GameEvent };
+const ok = (msg: string, ev?: GameEvent): Result => ({ ok: true, msg, ev });
+const fail = (msg: string, ev?: GameEvent): Result => ({ ok: false, msg, ev });
 
 /** Recupera energia pelo tempo real passado e renova as missões quando muda o dia. Chamar antes de toda ação. */
 export function tick(p: Player, now: number): void {
@@ -119,8 +121,8 @@ export function train(p: Player, stationId: string, now: number): Result {
   const st = STATIONS.find((s) => s.id === stationId);
   if (!st) return fail('Aparelho não existe.');
   if (!gymAccess(p, p.currentGym, now)) p.currentGym = 'bairro';
-  if (p.energy < BALANCE.trainEnergy) return fail('Sem energia. Descanse ou espere recarregar.');
-  if (p.satiety <= 0) return fail('Você está com muita fome para treinar. Coma algo.');
+  if (p.energy < BALANCE.trainEnergy) return fail('Sem energia. Descanse ou espere recarregar.', 'energia');
+  if (p.satiety <= 0) return fail('Você está com muita fome para treinar. Coma algo.', 'fome');
   const gym = GYMS.find((g) => g.id === p.currentGym)!;
   const hungry = p.satiety < BALANCE.hungryThreshold;
   const value = p.attrs[st.attr];
@@ -136,7 +138,7 @@ export function train(p: Player, stationId: string, now: number): Result {
   p.satiety = Math.max(0, p.satiety - BALANCE.trainSatiety);
   bump(p, 'treinar');
   const lv = addXp(p, BALANCE.trainXp + p.level * BALANCE.trainXpPerLevel, now);
-  return ok(`${st.name}: +${gain.toFixed(1)} ${ATTR_LABEL[st.attr]}${hungry ? ' (rendeu menos: com fome)' : ''}.${levelMsg(lv, p)}`);
+  return ok(`${st.name}: +${gain.toFixed(1)} ${ATTR_LABEL[st.attr]}${hungry ? ' (rendeu menos: com fome)' : ''}.${levelMsg(lv, p)}`, lv > 0 ? 'nivel' : undefined);
 }
 
 export function eat(p: Player, foodId: string, now: number): Result {
@@ -176,8 +178,8 @@ export function work(p: Player, jobId: string, now: number): Result {
   const job = JOBS.find((j) => j.id === jobId);
   if (!job) return fail('Esse trabalho não existe.');
   if (p.level < job.minLevel) return fail(`Precisa do nível ${job.minLevel}.`);
-  if (p.energy < job.energy) return fail('Sem energia para trabalhar.');
-  if (p.satiety <= 0) return fail('Você está com muita fome para trabalhar. Coma algo.');
+  if (p.energy < job.energy) return fail('Sem energia para trabalhar.', 'energia');
+  if (p.satiety <= 0) return fail('Você está com muita fome para trabalhar. Coma algo.', 'fome');
   const pay = jobPay(p.level, job.id);
   p.energy -= job.energy;
   p.satiety = Math.max(0, p.satiety - job.satiety);
@@ -284,7 +286,7 @@ export function claimMission(p: Player, id: string, now: number): Result {
   if (m.progress < def.goal) return fail('Missão ainda não concluída.');
   m.claimed = true;
   p.money += def.reward;
-  return ok(`+${def.reward} moedas pela missão.`);
+  return ok(`Missão cumprida: +${def.reward} moedas.`, 'missao');
 }
 
 /** Lista os oponentes disponíveis agora (mudam a cada hora e a cada luta). */
@@ -296,6 +298,7 @@ export function opponentList(p: Player, now: number, count = 3): Fighter[] {
 export type FightOutcome = {
   ok: boolean;
   msg: string;
+  ev?: GameEvent;
   fight?: FightResult;
   opponent?: Fighter;
   won?: boolean;
@@ -308,8 +311,8 @@ export type FightOutcome = {
 export function fight(p: Player, opponent: Fighter, now: number): FightOutcome {
   tick(p, now);
   if (Math.abs(opponent.level - p.level) > BALANCE.levelRange) return fail('Oponente fora da sua faixa de nível.');
-  if (p.energy < BALANCE.fightEnergy) return fail('Sem energia para lutar.');
-  if (p.satiety <= 0) return fail('Você está com muita fome para lutar. Coma algo.');
+  if (p.energy < BALANCE.fightEnergy) return fail('Sem energia para lutar.', 'energia');
+  if (p.satiety <= 0) return fail('Você está com muita fome para lutar. Coma algo.', 'fome');
   if (!p.deck.some((id) => TECH_BY_ID[id]?.kind === 'ataque')) return fail('Coloque ao menos uma técnica de ataque no deck.');
 
   const seed = hashString(`${p.createdAt}:${now}:${opponent.name}:${opponent.nickname}`);

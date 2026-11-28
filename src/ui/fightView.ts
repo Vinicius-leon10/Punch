@@ -2,8 +2,22 @@
 import { ARTS, TECH_BY_ID } from '../game/data';
 import type { FightEvent, FightResult } from '../game/fight';
 import type { Fighter } from '../game/state';
+import { bodyOf, getImage, poseName } from './art';
 import { ringBackground } from './scene';
 import { drawFighter, type Pose } from './sprite';
+
+type FPose = Pose | 'block';
+const POSE_H: Partial<Record<FPose, number>> = { ko: 96, win: 262 };
+const STAND_H = 236;
+
+/** Imagens de cada pose de um lutador. Oponentes com só uma arte usam a guarda em todas. */
+function looksOf(f: Fighter): Partial<Record<FPose, string>> | null {
+  if (f.sprite === 'rival') return { guard: 'rival_guarda', punch: 'rival_soco', kick: 'rival_soco', hit: 'rival_golpe', ko: 'rival_nocaute', win: 'rival_guarda', block: 'rival_guarda' };
+  if (f.sprite) return { guard: f.sprite };
+  const b = bodyOf(f);
+  const k = (key: string) => poseName(b, key);
+  return { guard: k('guarda'), punch: k('soco'), kick: k('chute'), hit: k('golpe'), ko: k('nocaute'), win: k('vitoria'), block: k('defesa') };
+}
 import { esc } from './util';
 
 interface Floating {
@@ -36,7 +50,7 @@ export function playFight(
           )
           .join('<div class="vs">VS</div>')}
       </div>
-      <canvas id="ring" width="640" height="300"></canvas>
+      <canvas id="ring" width="640" height="360"></canvas>
       <div class="fight-log" id="flog" aria-live="polite"></div>
       <div class="fight-actions" id="factions">
         <button data-f="speed">Velocidade: 1x</button>
@@ -50,7 +64,9 @@ export function playFight(
   const log = host.querySelector<HTMLElement>('#flog')!;
   const actions = host.querySelector<HTMLElement>('#factions')!;
   const { stats } = result;
-  const poses: [Pose, Pose] = ['guard', 'guard'];
+  const poses: [FPose, FPose] = ['guard', 'guard'];
+  const looks = [looksOf(fighters[0]), looksOf(fighters[1])];
+  const hitAt = [-1e9, -1e9];
   const poseUntil = [0, 0];
   const floats: Floating[] = [];
   let banner = { text: 'ROUND 1', born: performance.now() };
@@ -66,7 +82,42 @@ export function playFight(
       if (sta) host.querySelector<HTMLElement>(`#sta${i}`)!.style.width = `${Math.max(0, (100 * sta[i]) / stats[i].maxSta)}%`;
     }
   };
-  const posX = (i: number) => (i === 0 ? canvas.width * 0.36 : canvas.width * 0.64);
+  const posX = (i: number) => (i === 0 ? canvas.width * 0.32 : canvas.width * 0.68);
+  const BASE = 338;
+
+  /** Desenha a pose em imagem. Devolve false se a imagem ainda não carregou (usa o boneco antigo). */
+  const drawLook = (i: 0 | 1, pose: FPose, t: number): boolean => {
+    const look = looks[i];
+    if (!look) return false;
+    const name = look[pose] ?? look.guard!;
+    const im = getImage(name);
+    if (!im || !im.complete || !im.naturalWidth) return false;
+    const own = !!look[pose];
+    const h = own ? (POSE_H[pose] ?? STAND_H) : STAND_H;
+    const w = (im.naturalWidth / im.naturalHeight) * h;
+    const dir = i === 0 ? 1 : -1;
+    let x = posX(i);
+    if (pose === 'punch' || pose === 'kick') x += dir * (own ? 18 : 34);
+    if (pose === 'hit') x -= dir * 12;
+    const since = t - hitAt[i];
+    if (since < 220) x += Math.sin(since / 18) * 6;
+    ctx.save();
+    if (since < 220) ctx.filter = 'brightness(1.9) sepia(1) saturate(5) hue-rotate(-25deg)';
+    if (pose === 'ko' && !own) {
+      // Sem pose de nocaute: a guarda tomba para trás.
+      ctx.translate(x, BASE - 8);
+      ctx.rotate((dir * Math.PI) / 2);
+      ctx.drawImage(im, -w / 2, -h + 10, w, h);
+    } else if (pose === 'punch' && !own) {
+      ctx.translate(x, BASE);
+      ctx.rotate(-dir * 0.08);
+      ctx.drawImage(im, -w / 2, -h, w, h);
+    } else {
+      ctx.drawImage(im, x - w / 2, BASE - h, w, h);
+    }
+    ctx.restore();
+    return true;
+  };
   const addLog = (html: string) => {
     const p = document.createElement('p');
     p.innerHTML = html;
@@ -90,6 +141,7 @@ export function playFight(
         const foe = e.who === 0 ? 1 : 0;
         poses[e.who] = attackPose(e.tech);
         poses[foe] = 'hit';
+        hitAt[foe] = t;
         poseUntil[e.who] = poseUntil[foe] = t + hold;
         floats.push({ x: posX(foe), y: 120, text: `${e.crit ? 'CRÍTICO ' : ''}-${e.dmg}`, color: e.crit ? '#ffd23f' : '#ff5a5a', born: t });
         setBars(e.hp, e.sta);
@@ -102,6 +154,10 @@ export function playFight(
         const foe = e.who === 0 ? 1 : 0;
         poses[e.who] = attackPose(e.tech);
         poseUntil[e.who] = t + hold;
+        if (e.reason === 'defesa') {
+          poses[foe] = 'block';
+          poseUntil[foe] = t + hold;
+        }
         floats.push({ x: posX(foe), y: 120, text: e.reason === 'esquiva' ? 'ESQUIVOU' : techName(e.defense ?? ''), color: '#9ad1ff', born: t });
         setBars(e.hp, e.sta);
         addLog(`${name(foe)} ${e.reason === 'esquiva' ? 'esquivou de' : `usou ${techName(e.defense ?? '')} contra`} ${techName(e.tech)}.`);
@@ -155,17 +211,35 @@ export function playFight(
     }
     for (const i of [0, 1]) if (t > poseUntil[i]) poses[i] = 'guard';
 
-    ctx.imageSmoothingEnabled = false;
-    // Fundo: ringue com público na penumbra (pixel art ampliada 4x).
-    ctx.drawImage(ringBackground(), 0, 0, canvas.width, canvas.height);
+    // Fundo: o ringue do projeto (art/) cobrindo o quadro; o desenhado em código só enquanto carrega.
+    const bg = getImage('bg_ringue');
+    if (bg && bg.complete && bg.naturalWidth) {
+      const sc = Math.max(canvas.width / bg.naturalWidth, canvas.height / bg.naturalHeight);
+      const bw = bg.naturalWidth * sc;
+      const bh = bg.naturalHeight * sc;
+      ctx.drawImage(bg, (canvas.width - bw) / 2, (canvas.height - bh) / 2, bw, bh);
+    } else {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(ringBackground(), 0, 0, canvas.width, canvas.height);
+    }
+    ctx.imageSmoothingEnabled = true;
+    ctx.fillStyle = 'rgba(0, 0, 0, .35)';
+    for (const i of [0, 1]) {
+      ctx.beginPath();
+      ctx.ellipse(posX(i), BASE, 70, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     for (const i of [0, 1] as const) {
-      const lunge = poses[i] === 'punch' || poses[i] === 'kick' ? 26 : poses[i] === 'hit' ? -10 : 0;
-      drawFighter(ctx, fighters[i], posX(i) + (i === 0 ? lunge : -lunge), 236, 4, i === 0 ? 1 : -1, poses[i], t + i * 300);
+      if (drawLook(i, poses[i], t)) continue;
+      const pose: Pose = poses[i] === 'block' ? 'guard' : (poses[i] as Pose);
+      const lunge = pose === 'punch' || pose === 'kick' ? 26 : pose === 'hit' ? -10 : 0;
+      ctx.imageSmoothingEnabled = false;
+      drawFighter(ctx, fighters[i], posX(i) + (i === 0 ? lunge : -lunge), BASE, 4, i === 0 ? 1 : -1, pose, t + i * 300);
     }
 
     ctx.textAlign = 'center';
-    ctx.font = '16px Silkscreen, "Press Start 2P", monospace';
+    ctx.font = '22px "Lilita One", Impact, sans-serif';
     for (let k = floats.length - 1; k >= 0; k--) {
       const fl = floats[k];
       const age = (t - fl.born) / 900;
@@ -183,7 +257,7 @@ export function playFight(
     const bAge = (t - banner.born) / 1200;
     if (bAge < 1 || banner.text === 'NOCAUTE!') {
       ctx.globalAlpha = banner.text === 'NOCAUTE!' ? 1 : 1 - bAge;
-      ctx.font = '40px Bungee, Impact, sans-serif';
+      ctx.font = '52px "Lilita One", Impact, sans-serif';
       ctx.fillStyle = '#000';
       ctx.fillText(banner.text, canvas.width / 2 + 3, 93);
       ctx.fillStyle = banner.text === 'NOCAUTE!' ? '#ff5470' : '#ffd23f';

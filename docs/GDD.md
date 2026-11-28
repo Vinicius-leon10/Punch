@@ -44,7 +44,7 @@ aprende técnicas com mestres, compra equipamentos e sobe no **ranking PvP** enf
 | Renda real | **VIP mensal**, **itens visuais**, **venda de Ouro** |
 | Loja | Todos os itens à venda, os melhores também por Ouro |
 | Equipamento | Luvas, Shorts, Protetor bucal |
-| Personagem | Personalização média: nome, apelido, arte, pele, cabelo, barba, tatuagem |
+| Personagem | Nome, apelido, arte e **lutador ou lutadora**. As telas usam as poses de `art/` (cada um com as suas); pele, cabelo e barba saíram do protótipo porque as poses são desenhadas. A roupa comprada aparece na aba Lutador quando existe pose dela (Lote 1 e Lote 10) |
 | Social | Equipes de jogadores, amigos + desafio amistoso, chat |
 
 ## 3. Ciclo principal

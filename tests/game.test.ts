@@ -272,7 +272,7 @@ describe('arte dos oponentes', () => {
     const existsSync = (path: string) => files.includes(`../${path}`);
     const { OPPONENT_SPRITES } = await import('../src/game/opponents');
     const women = ['Lu', 'Carol', 'Bia', 'Rose', 'Dani', 'Fê'];
-    for (const s of [...OPPONENT_SPRITES.homem, ...OPPONENT_SPRITES.mulher]) expect(existsSync(`src/assets/img/${s}.png`), s).toBe(true);
+    for (const s of [...OPPONENT_SPRITES.homem, ...OPPONENT_SPRITES.mulher]) expect(existsSync(`src/assets/img/${s}.png`) || existsSync(`src/assets/img/${s}_guarda.png`), s).toBe(true);
     for (let i = 0; i < 200; i++) {
       const o = makeOpponent(10, `arte${i}`);
       const list = women.includes(o.name) ? OPPONENT_SPRITES.mulher : OPPONENT_SPRITES.homem;
