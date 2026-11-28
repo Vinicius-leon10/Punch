@@ -1,4 +1,6 @@
 // Ícones em pixel art (8x8 ou 10x10) gerados como SVG. Cada letra é uma cor da paleta do ícone.
+import { hasImg, img } from './art';
+
 type Icon = { rows: string[]; pal: Record<string, string> };
 
 const ICONS: Record<string, Icon> = {
@@ -64,7 +66,11 @@ const ICONS: Record<string, Icon> = {
   },
 };
 
+/** Ícones que usam a arte do projeto em vez do desenho em pixels. */
+const ART_ICONS: Record<string, string> = { coin: 'moedas', gold: 'diamante' };
+
 export function ic(name: string, size = 16): string {
+  if (ART_ICONS[name] && hasImg(ART_ICONS[name])) return img(ART_ICONS[name], 'ic').replace('<img ', `<img width="${size}" height="${size}" `);
   const icon = ICONS[name];
   if (!icon) return '';
   const h = icon.rows.length;

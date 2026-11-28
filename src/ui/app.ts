@@ -41,6 +41,7 @@ import {
   type Player,
 } from '../game/state';
 import { playFight } from './fightView';
+import { FOOD_IMG, GEAR_IMG, JOB_IMG, MASTER_IMG, STATION_IMG, img } from './art';
 import { ic } from './icons';
 import { drawStreet } from './scene';
 import { avatar, portrait } from './sprite';
@@ -242,7 +243,7 @@ export function startApp(root: HTMLElement) {
         <p class="muted small">Treinar e lutar dão fome. Com menos de ${BALANCE.hungryThreshold} de saciedade o treino rende metade; com 0 você não treina nem luta.</p>
         <div class="list">
           ${FOODS.map(
-            (f) => `<div class="row"><div><b>${f.name}</b><div class="tiny muted">+${f.satiety} saciedade${f.energy ? ` · +${f.energy} energia` : ''}</div></div>
+            (f) => `<div class="row">${img(FOOD_IMG[f.id], 'row-img')}<div><b>${f.name}</b><div class="tiny muted">+${f.satiety} saciedade${f.energy ? ` · +${f.energy} energia` : ''}</div></div>
               <button data-act="eat" data-arg="${f.id}" ${p.money < f.price ? 'disabled' : ''}>${ic('coin', 14)} ${f.price}</button></div>`,
           ).join('')}
         </div>
@@ -254,14 +255,14 @@ export function startApp(root: HTMLElement) {
     return `
     <div class="card">
       <h2>Bicos</h2>
-      <p class="muted small">Trabalhar troca energia por moedas, sem XP. Rende menos que lutar, mas é dinheiro garantido quando a fase está difícil.</p>
+      <div class="host">${img('lanchonete', 'host-img')}<p class="muted small">Trabalhar troca energia por moedas, sem XP. Rende menos que lutar, mas é dinheiro garantido quando a fase está difícil.</p></div>
       <div class="list">
         ${JOBS.map((j) => {
           const btn =
             p.level < j.minLevel
               ? `<button disabled>Nível ${j.minLevel}</button>`
               : `<button data-act="work" data-arg="${j.id}" ${p.energy < j.energy ? 'disabled' : ''}>${ic('coin', 14)} +${A.jobPay(p.level, j.id)}</button>`;
-          return `<div class="row"><div><b>${j.name}</b><div class="tiny muted">${j.description} ${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
+          return `<div class="row">${img(JOB_IMG[j.id], 'row-img')}<div><b>${j.name}</b><div class="tiny muted">${j.description} ${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
         }).join('')}
       </div>
     </div>`;
@@ -273,12 +274,12 @@ export function startApp(root: HTMLElement) {
     return `
     <div class="card">
       <h2>${gym.name}</h2>
-      <p class="muted small">Cada treino gasta ${BALANCE.trainEnergy} de energia e ${BALANCE.trainSatiety} de saciedade, dá XP ao personagem e aumenta um atributo. Quanto mais alto o atributo, menos ele sobe por treino.
-      ${p.wheyCharges > 0 ? `<br><b>Whey ativo:</b> ${p.wheyCharges} treinos com +${BALANCE.wheyBonus * 100}%.` : ''}</p>
+      <div class="host">${gym.id === 'bairro' ? img('retrato_neide', 'host-img', 'Dona Neide') : ''}<p class="muted small">${gym.id === 'bairro' ? '<b>Dona Neide</b>, dona da academia, cuida do seu treino. ' : ''}Cada treino gasta ${BALANCE.trainEnergy} de energia e ${BALANCE.trainSatiety} de saciedade, dá XP ao personagem e aumenta um atributo. Quanto mais alto o atributo, menos ele sobe por treino.
+      ${p.wheyCharges > 0 ? `<br><b>Whey ativo:</b> ${p.wheyCharges} treinos com +${BALANCE.wheyBonus * 100}%.` : ''}</p></div>
       <div class="stations">
         ${STATIONS.map(
           (s) => `<button class="station" data-act="train" data-arg="${s.id}" ${p.energy < BALANCE.trainEnergy ? 'disabled' : ''}>
-            <b>${s.name}</b><span>${ATTR_LABEL[s.attr]} ${Math.floor(p.attrs[s.attr])}</span></button>`,
+            ${img(STATION_IMG[s.id], 'station-img')}<b>${s.name}</b><span>${ATTR_LABEL[s.attr]} ${Math.floor(p.attrs[s.attr])}</span></button>`,
         ).join('')}
       </div>
     </div>
@@ -320,8 +321,9 @@ export function startApp(root: HTMLElement) {
       .map(
         (art: ArtId) => `
       <div class="card">
+        <div class="host">${img(MASTER_IMG[art], 'host-img', ARTS[art].master)}<div>
         <h2 style="color:${ARTS[art].color}">${ARTS[art].master} · ${ARTS[art].name}</h2>
-        <p class="muted small">${art === p.art ? 'Sua arte principal: técnicas com +20% de dano e preço normal.' : 'Outra arte: custa 50% a mais, sem bônus de dano. Use para cobrir fraquezas (defesa, chão, chutes).'}</p>
+        <p class="muted small">${art === p.art ? 'Sua arte principal: técnicas com +20% de dano e preço normal.' : 'Outra arte: custa 50% a mais, sem bônus de dano. Use para cobrir fraquezas (defesa, chão, chutes).'}</p></div></div>
         <div class="list">
           ${TECHNIQUES.filter((t) => t.art === art)
             .map((t) => {
@@ -396,7 +398,7 @@ export function startApp(root: HTMLElement) {
     return `
     <div class="card">
       <h2>Equipamentos</h2>
-      <p class="muted small">Bônus somado dos equipamentos limitado a +15 por atributo: quem treina ainda vence quem só compra.</p>
+      <div class="host">${img('dono_loja', 'host-img')}<p class="muted small">Bônus somado dos equipamentos limitado a +15 por atributo: quem treina ainda vence quem só compra.</p></div>
       ${(['luvas', 'shorts', 'protetor'] as Slot[])
         .map(
           (slot) => `<div class="field-label">${SLOT_LABEL[slot]}</div><div class="shop">${GEAR.filter((g) => g.slot === slot)
@@ -409,7 +411,7 @@ export function startApp(root: HTMLElement) {
                 : p.level < g.minLevel
                   ? `<button disabled>Nível ${g.minLevel}</button>`
                   : `<button data-act="buy" data-arg="${g.id}" ${can ? '' : 'disabled'}>${cost}</button>`;
-              return `<div class="item r-${g.rarity}"><span class="swatch-sm" style="background:${g.color}"></span><b>${g.name}</b>
+              return `<div class="item r-${g.rarity}">${img(GEAR_IMG[g.id], 'gear-img') || `<span class="swatch-sm" style="background:${g.color}"></span>`}<b>${g.name}</b>
                 <span class="tiny">${RARITY_LABEL[g.rarity]}</span>
                 <span class="tiny muted">${Object.entries(g.bonus)
                   .map(([k, v]) => `+${v} ${ATTR_LABEL[k as keyof typeof ATTR_LABEL]}`)
@@ -422,9 +424,9 @@ export function startApp(root: HTMLElement) {
     <div class="card">
       <h2>Suplementos</h2>
       <div class="list">
-        <div class="row"><div><b>Whey</b><div class="tiny muted">Próximos ${BALANCE.wheyCharges} treinos rendem +${BALANCE.wheyBonus * 100}%.</div></div>
+        <div class="row">${img('whey', 'row-img')}<div><b>Whey</b><div class="tiny muted">Próximos ${BALANCE.wheyCharges} treinos rendem +${BALANCE.wheyBonus * 100}%.</div></div>
           <button data-act="whey" ${p.money < BALANCE.wheyPrice ? 'disabled' : ''}>${ic('coin', 14)} ${BALANCE.wheyPrice}</button></div>
-        <div class="row"><div><b>Energético</b><div class="tiny muted">+${BALANCE.energyDrinkAmount} de energia na hora.</div></div>
+        <div class="row">${img('energetico', 'row-img')}<div><b>Energético</b><div class="tiny muted">+${BALANCE.energyDrinkAmount} de energia na hora.</div></div>
           <button data-act="drink" ${p.gold < BALANCE.energyDrinkGold ? 'disabled' : ''}>${ic('gold', 14)} ${BALANCE.energyDrinkGold}</button></div>
       </div>
     </div>`;
@@ -443,10 +445,12 @@ export function startApp(root: HTMLElement) {
     const last = p.lastSeason;
     return `
     <div class="card">
+      <div class="host">${img('cinturao', 'host-img belt')}<div>
       <h2>Ranking PvP — temporada ${new Date(t).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</h2>
       <p><span class="div" style="--c:${div.color}">${div.name}</span> ${p.rankPoints} pts ${nextDiv ? `· faltam ${nextDiv.min - p.rankPoints} para ${nextDiv.name}` : '· topo!'}</p>
-      <p class="small">Termina em ${fmtDuration(seasonEndsAt(t) - t)}. Prêmio se terminar agora: ${prize(div.reward)}. Na virada você mantém ${SEASON_KEEP * 100}% dos pontos.</p>
-      ${last ? `<p class="tiny muted">Temporada passada (${last.season}): ${last.division} com ${last.points} pts · ganhou ${prize(last)}.</p>` : ''}
+      <p class="small">Termina em ${fmtDuration(seasonEndsAt(t) - t)}. ${img('bau', 'inline-img')} Prêmio se terminar agora: ${prize(div.reward)}. Na virada você mantém ${SEASON_KEEP * 100}% dos pontos.</p>
+      </div></div>
+      ${last ? `<p class="tiny muted">${img('bau', 'inline-img')} Temporada passada (${last.season}): ${last.division} com ${last.points} pts · ganhou ${prize(last)}.</p>` : ''}
       <p class="muted small">Só aparecem oponentes até ±${BALANCE.levelRange} níveis do seu. Vitória: +25 pts (mais se o oponente for de nível maior). Derrota: −15 pts, mas você ganha XP e moedas igual.
       Cada luta gasta ${BALANCE.fightEnergy} de energia e ${BALANCE.fightSatiety} de saciedade.</p>
       <p class="tiny muted">Protótipo: os oponentes são "fantasmas" gerados pelo jogo. Na versão online serão personagens de outros jogadores.</p>
