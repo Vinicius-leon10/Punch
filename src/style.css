@@ -225,6 +225,7 @@ img.gfx.ic { display: inline-block; vertical-align: -3px; }
 .host-img { width: 84px; height: 100px; flex: none; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .35)); }
 .host-img.belt { width: 96px; height: 60px; transform: rotate(-6deg); }
 .row-img { width: 52px; height: 52px; flex: none; }
+.row-img.job { width: 72px; height: 72px; }
 .station-img { width: 100%; height: 84px; }
 .gear-img { width: 100%; height: 56px; margin-bottom: 2px; }
 .inline-img { display: inline-block !important; width: 20px; height: 20px; vertical-align: -5px; }

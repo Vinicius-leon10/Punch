@@ -67,7 +67,20 @@ const ICONS: Record<string, Icon> = {
 };
 
 /** Ícones que usam a arte do projeto em vez do desenho em pixels. */
-const ART_ICONS: Record<string, string> = { coin: 'moedas', gold: 'diamante', vip: 'icone_vip', missions: 'icone_missoes', energy: 'icone_energia' };
+const ART_ICONS: Record<string, string> = {
+  coin: 'moedas',
+  gold: 'diamante',
+  vip: 'icone_vip',
+  missions: 'icone_missoes',
+  energy: 'icone_energia',
+  home: 'icone_casa',
+  train: 'icone_treinar',
+  fight: 'icone_arena',
+  master: 'icone_mestres',
+  fighter: 'icone_lutador',
+  work: 'icone_trabalho',
+  shop: 'icone_loja',
+};
 
 export function ic(name: string, size = 16): string {
   if (ART_ICONS[name] && hasImg(ART_ICONS[name])) return img(ART_ICONS[name], 'ic').replace('<img ', `<img width="${size}" height="${size}" `);

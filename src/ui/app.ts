@@ -276,7 +276,7 @@ export function startApp(root: HTMLElement) {
             p.level < j.minLevel
               ? `<button disabled>Nível ${j.minLevel}</button>`
               : `<button data-act="work" data-arg="${j.id}" ${p.energy < j.energy ? 'disabled' : ''}>${ic('coin', 14)} +${A.jobPay(p.level, j.id)}</button>`;
-          return `<div class="row">${img(JOB_IMG[j.id], 'row-img')}<div><b>${j.name}</b><div class="tiny muted">${j.description} ${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
+          return `<div class="row">${img(JOB_IMG[j.id], 'row-img job')}<div><b>${j.name}</b><div class="tiny muted">${j.description} ${ic('energy', 12)} ${j.energy} · ${ic('food', 12)} ${j.satiety}</div></div>${btn}</div>`;
         }).join('')}
       </div>
     </div>`;

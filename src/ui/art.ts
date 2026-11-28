@@ -47,4 +47,4 @@ export const MASTER_IMG: Record<string, string> = {
   capoeira: 'retrato_bimbinha',
 };
 
-export const JOB_IMG: Record<string, string> = { lanchonete: 'lanchonete' };
+export const JOB_IMG: Record<string, string> = { lanchonete: 'trabalho_lanchonete', entregas: 'trabalho_entregas', seguranca: 'trabalho_seguranca' };
