@@ -3,6 +3,12 @@ import { hashString, makeRng, pick, randInt, shuffle } from './rng';
 import { deckSlots, type Fighter } from './state';
 
 const FIRST = ['Zé', 'Rafa', 'Bruno', 'Thiago', 'Duda', 'Leo', 'Marcão', 'Japa', 'Biel', 'Nando', 'Lu', 'Carol', 'Bia', 'Rose', 'Dani', 'Fê'];
+const WOMEN = new Set(['Lu', 'Carol', 'Bia', 'Rose', 'Dani', 'Fê']);
+/** Artes de oponente (art/v7-lote6 e art/v8-chatgpt), separadas para combinar com o nome. */
+export const OPPONENT_SPRITES = {
+  homem: ['oponente_1', 'oponente_2', 'oponente_3', 'oponente_5', 'oponente_6', 'oponente_8'],
+  mulher: ['oponente_4', 'oponente_7'],
+};
 const NICK = ['Trovão', 'Furacão', 'Marreta', 'Pitbull', 'Sombra', 'Muralha', 'Navalha', 'Tanque', 'Cobra', 'Fera', 'Tsunami', 'Raio'];
 
 /** Pontos de atributo esperados para um lutador do nível dado (média de quem treina normalmente). */
@@ -50,8 +56,9 @@ export function makeOpponent(playerLevel: number, seedKey: string): Fighter {
     if (g.minLevel <= level && g.currency === 'moedas' && rng() < 0.7) equipped[g.slot] = g.id;
   }
 
+  const name = pick(rng, FIRST);
   return {
-    name: pick(rng, FIRST),
+    name,
     nickname: pick(rng, NICK),
     art,
     level,
@@ -66,5 +73,7 @@ export function makeOpponent(playerLevel: number, seedKey: string): Fighter {
       beard: rng() < 0.4,
       tattoo: rng() < 0.4,
     },
+    // Sorteado por último para não mudar os números da luta.
+    sprite: pick(rng, WOMEN.has(name) ? OPPONENT_SPRITES.mulher : OPPONENT_SPRITES.homem),
   };
 }

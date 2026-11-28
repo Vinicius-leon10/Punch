@@ -476,7 +476,7 @@ export function startApp(root: HTMLElement) {
           const power = Math.round(ATTRS.reduce((s, k) => s + eff[k], 0));
           const mine = Math.round(ATTRS.reduce((s, k) => s + effectiveAttrs(p)[k], 0));
           return `<div class="card opp">
-            <canvas data-portrait="opp${i}" width="120" height="160"></canvas>
+            ${img(o.sprite, 'opp-img', `${o.name} "${o.nickname}"`) || `<canvas data-portrait="opp${i}" width="120" height="160"></canvas>`}
             <b>${esc(o.name)} "${esc(o.nickname)}"</b>
             <div class="small">Nível ${o.level} · <span style="color:${ARTS[o.art].color}">${ARTS[o.art].name}</span></div>
             <div class="tiny muted">Poder ${power} (você: ${mine})</div>

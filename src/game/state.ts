@@ -42,6 +42,8 @@ export interface Fighter {
   deck: string[];
   equipped: Partial<Record<Slot, string>>;
   appearance: Appearance;
+  /** Arte do oponente (fantasma), ex.: "oponente_3". O jogador não usa. */
+  sprite?: string;
 }
 
 export interface SeasonResult {
