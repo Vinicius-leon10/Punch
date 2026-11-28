@@ -118,6 +118,18 @@ Tipos de técnica:
 - **Preparo**: deixa os próximos golpes mais fortes (Clinch, Queda).
 - **Passiva**: bônus permanente (+vida, +esquiva, +fôlego).
 
+**Árvore de técnicas:** algumas técnicas exigem outra da mesma arte antes (pré-requisito). Isso vale também para
+quem compra de outra arte, então cobrir uma fraqueza com o golpe mais forte de outro estilo custa a cadeia inteira.
+
+| Arte | Cadeias |
+|---|---|
+| Boxe | Gancho → Cruzado de Direita → Uppercut · Guarda Alta → Jogo de Pernas |
+| Muay Thai | Clinch → Cotovelada → Chute Alto |
+| Jiu-jitsu | Chave de Braço → Mata-leão · Guarda Fechada → Fôlego de Tatame |
+| Capoeira | Rasteira → Martelo → Parafuso |
+
+Os fantasmas seguem as mesmas regras.
+
 Cada arte tem 7–8 técnicas, 3 delas iniciais grátis. A lista completa e os números ficam em `src/game/data.ts`.
 
 | Arte | Mestre | Estilo |

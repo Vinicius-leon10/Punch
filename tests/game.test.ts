@@ -179,3 +179,38 @@ describe('trabalho', () => {
     }
   });
 });
+
+describe('pré-requisitos de técnicas', () => {
+  it('apontam para técnica da mesma arte, de nível menor, sem ciclo', () => {
+    for (const t of TECHNIQUES.filter((t) => t.requires)) {
+      const r = TECHNIQUES.find((x) => x.id === t.requires);
+      expect(r, t.id).toBeDefined();
+      expect(r!.art).toBe(t.art);
+      expect(r!.minLevel).toBeLessThan(t.minLevel);
+    }
+  });
+  it('toda técnica inicial e pelo menos uma paga de cada arte ficam livres de pré-requisito', () => {
+    for (const art of ['boxe', 'muaythai', 'jiujitsu', 'capoeira']) {
+      const list = TECHNIQUES.filter((t) => t.art === art);
+      expect(list.filter((t) => t.price === 0).every((t) => !t.requires)).toBe(true);
+      expect(list.some((t) => t.price > 0 && !t.requires)).toBe(true);
+    }
+  });
+  it('não aprende sem o pré-requisito', () => {
+    const p = newPlayer();
+    p.money = 10_000;
+    p.level = 8;
+    expect(A.learnTechnique(p, 'cruzado', T0).ok).toBe(false);
+    expect(A.learnTechnique(p, 'gancho', T0).ok).toBe(true);
+    expect(A.learnTechnique(p, 'cruzado', T0).ok).toBe(true);
+  });
+  it('fantasmas só levam técnicas com pré-requisito cumprido', () => {
+    for (let i = 0; i < 200; i++) {
+      const o = makeOpponent(20, `pre${i}`);
+      for (const id of o.techniques) {
+        const t = TECHNIQUES.find((x) => x.id === id)!;
+        if (t.requires) expect(o.techniques).toContain(t.requires);
+      }
+    }
+  });
+});

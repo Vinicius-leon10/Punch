@@ -329,9 +329,11 @@ export function startApp(root: HTMLElement) {
                 ? '<button disabled>Aprendida</button>'
                 : p.level < t.minLevel
                   ? `<button disabled>Nível ${t.minLevel}</button>`
-                  : `<button data-act="learn" data-arg="${t.id}" ${p.money < price ? 'disabled' : ''}>${ic('coin', 14)} ${price}</button>`;
+                  : t.requires && !p.techniques.includes(t.requires)
+                    ? `<button disabled>Antes: ${TECH_BY_ID[t.requires].name}</button>`
+                    : `<button data-act="learn" data-arg="${t.id}" ${p.money < price ? 'disabled' : ''}>${ic('coin', 14)} ${price}</button>`;
               return `<div class="row"><div><b>${t.name}</b> <span class="tag ${t.kind}">${t.kind}</span>
-                <div class="tiny muted">${t.description} ${techLine(t)}</div></div>${btn}</div>`;
+                <div class="tiny muted">${t.description} ${techLine(t)}${t.requires ? ` · requer ${TECH_BY_ID[t.requires].name}` : ''}</div></div>${btn}</div>`;
             })
             .join('')}
         </div>

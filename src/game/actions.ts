@@ -176,6 +176,7 @@ export function learnTechnique(p: Player, techId: string, now: number): Result {
   if (!t) return fail('Técnica não existe.');
   if (p.techniques.includes(t.id)) return fail('Você já sabe essa técnica.');
   if (p.level < t.minLevel) return fail(`Precisa do nível ${t.minLevel}.`);
+  if (t.requires && !p.techniques.includes(t.requires)) return fail(`Aprenda ${TECH_BY_ID[t.requires].name} antes.`);
   const price = techPrice(p, t);
   if (p.money < price) return fail('Moedas insuficientes.');
   p.money -= price;

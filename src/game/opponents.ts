@@ -22,7 +22,13 @@ export function makeOpponent(playerLevel: number, seedKey: string): Fighter {
   const base = expectedAttr(level);
   const attrs = Object.fromEntries(ATTRS.map((k) => [k, Math.max(1, base * (0.75 + rng() * 0.5))])) as Attrs;
 
-  const learnable = TECHNIQUES.filter((t) => t.minLevel <= level && (t.art === art || rng() < 0.15));
+  const picked = TECHNIQUES.filter((t) => t.minLevel <= level && (t.art === art || rng() < 0.15));
+  // Respeita os pré-requisitos: o fantasma só usa o que um jogador real conseguiria ter aprendido.
+  const has = (id: string): boolean => {
+    const t = picked.find((x) => x.id === id);
+    return !!t && (!t.requires || has(t.requires));
+  };
+  const learnable = picked.filter((t) => has(t.id));
   const own = learnable.filter((t) => t.art === art);
   const others = learnable.filter((t) => t.art !== art);
   const pool = [...shuffle(rng, own), ...others];
@@ -31,6 +37,13 @@ export function makeOpponent(playerLevel: number, seedKey: string): Fighter {
   // Garante ao menos dois ataques.
   for (const t of pool.filter((t) => t.kind === 'ataque')) if (deck.length < 2) deck.push(t.id);
   for (const t of pool) if (deck.length < slots && !deck.includes(t.id)) deck.push(t.id);
+
+  // Técnicas conhecidas = deck + os pré-requisitos de cada uma.
+  const techniques = deck.slice();
+  for (let i = 0; i < techniques.length; i++) {
+    const req = learnable.find((t) => t.id === techniques[i])?.requires;
+    if (req && !techniques.includes(req)) techniques.push(req);
+  }
 
   const equipped: Fighter['equipped'] = {};
   for (const g of GEAR) {
@@ -43,7 +56,7 @@ export function makeOpponent(playerLevel: number, seedKey: string): Fighter {
     art,
     level,
     attrs,
-    techniques: deck.slice(),
+    techniques,
     deck,
     equipped,
     appearance: {

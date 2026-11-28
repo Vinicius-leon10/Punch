@@ -70,6 +70,8 @@ export interface Technique {
   /** Preço com o mestre para quem é da arte. Fora da arte custa 50% a mais. 0 = inicial grátis. */
   price: number;
   description: string;
+  /** Técnica (da mesma arte) que precisa ser aprendida antes. */
+  requires?: string;
   // ataque
   power?: number;
   stamina?: number;
@@ -98,18 +100,18 @@ export const TECHNIQUES: Technique[] = [
   T({ id: 'esquiva', name: 'Esquiva Lateral', art: 'boxe', kind: 'defesa', minLevel: 1, price: 0, chance: 0.4, reduce: 1, cooldown: 2, description: '40% de chance de escapar totalmente de um golpe.' }),
   T({ id: 'gancho', name: 'Gancho', art: 'boxe', kind: 'ataque', minLevel: 3, price: 120, power: 14, stamina: 12, cooldown: 2, description: 'Soco curvo na linha da cintura.' }),
   T({ id: 'guarda', name: 'Guarda Alta', art: 'boxe', kind: 'defesa', minLevel: 5, price: 200, chance: 0.5, reduce: 0.5, cooldown: 1, description: '50% de chance de reduzir o dano pela metade.' }),
-  T({ id: 'cruzado', name: 'Cruzado de Direita', art: 'boxe', kind: 'ataque', minLevel: 8, price: 300, power: 19, stamina: 14, cooldown: 3, description: 'Golpe de nocaute por cima da guarda.' }),
-  T({ id: 'footwork', name: 'Jogo de Pernas', art: 'boxe', kind: 'passiva', minLevel: 12, price: 500, dodge: 0.05, description: '+5% de esquiva permanente.' }),
-  T({ id: 'uppercut', name: 'Uppercut', art: 'boxe', kind: 'ataque', minLevel: 15, price: 700, power: 22, stamina: 18, cooldown: 3, description: 'Soco de baixo para cima no queixo.' }),
+  T({ id: 'cruzado', name: 'Cruzado de Direita', art: 'boxe', kind: 'ataque', minLevel: 8, price: 300, requires: 'gancho', power: 19, stamina: 14, cooldown: 3, description: 'Golpe de nocaute por cima da guarda.' }),
+  T({ id: 'footwork', name: 'Jogo de Pernas', art: 'boxe', kind: 'passiva', minLevel: 12, price: 500, requires: 'guarda', dodge: 0.05, description: '+5% de esquiva permanente.' }),
+  T({ id: 'uppercut', name: 'Uppercut', art: 'boxe', kind: 'ataque', minLevel: 15, price: 700, requires: 'cruzado', power: 22, stamina: 18, cooldown: 3, description: 'Soco de baixo para cima no queixo.' }),
 
   // ---------- Muay Thai ----------
   T({ id: 'chutebaixo', name: 'Chute Baixo', art: 'muaythai', kind: 'ataque', minLevel: 1, price: 0, power: 8, stamina: 6, cooldown: 0, description: 'Chute na coxa que desgasta.' }),
   T({ id: 'joelhada', name: 'Joelhada', art: 'muaythai', kind: 'ataque', minLevel: 1, price: 0, power: 14, stamina: 10, cooldown: 1, description: 'Joelho no corpo na curta distância.' }),
   T({ id: 'bloqueiocanela', name: 'Bloqueio de Canela', art: 'muaythai', kind: 'defesa', minLevel: 1, price: 0, chance: 0.45, reduce: 0.6, cooldown: 1, description: '45% de chance de reduzir 60% do dano.' }),
   T({ id: 'clinch', name: 'Clinch', art: 'muaythai', kind: 'preparo', minLevel: 4, price: 150, stamina: 8, cooldown: 4, buffHits: 2, buffPower: 0.6, description: 'Agarra a nuca: próximos 2 ataques +60% de dano.' }),
-  T({ id: 'cotovelada', name: 'Cotovelada', art: 'muaythai', kind: 'ataque', minLevel: 6, price: 250, power: 19, stamina: 13, cooldown: 2, description: 'Corta o supercílio.' }),
+  T({ id: 'cotovelada', name: 'Cotovelada', art: 'muaythai', kind: 'ataque', minLevel: 6, price: 250, requires: 'clinch', power: 19, stamina: 13, cooldown: 2, description: 'Corta o supercílio.' }),
   T({ id: 'corpofechado', name: 'Corpo Fechado', art: 'muaythai', kind: 'passiva', minLevel: 10, price: 450, hpPct: 0.1, description: '+10% de vida máxima.' }),
-  T({ id: 'chutealto', name: 'Chute Alto', art: 'muaythai', kind: 'ataque', minLevel: 12, price: 600, power: 25, stamina: 18, cooldown: 3, description: 'Chute na cabeça. Arriscado e devastador.' }),
+  T({ id: 'chutealto', name: 'Chute Alto', art: 'muaythai', kind: 'ataque', minLevel: 12, price: 600, requires: 'cotovelada', power: 25, stamina: 18, cooldown: 3, description: 'Chute na cabeça. Arriscado e devastador.' }),
 
   // ---------- Jiu-jitsu ----------
   T({ id: 'queda', name: 'Queda', art: 'jiujitsu', kind: 'preparo', minLevel: 1, price: 0, stamina: 8, cooldown: 3, buffHits: 3, buffPower: 0.5, description: 'Leva ao chão: próximos 3 ataques +50% de dano.' }),
@@ -117,17 +119,17 @@ export const TECHNIQUES: Technique[] = [
   T({ id: 'raspagem', name: 'Raspagem', art: 'jiujitsu', kind: 'defesa', minLevel: 1, price: 0, chance: 0.4, reduce: 0.7, cooldown: 2, description: '40% de chance de reduzir 70% do dano.' }),
   T({ id: 'chavebraco', name: 'Chave de Braço', art: 'jiujitsu', kind: 'ataque', minLevel: 6, price: 250, power: 18, stamina: 16, cooldown: 3, description: 'Hiperextensão do cotovelo.' }),
   T({ id: 'guardafechada', name: 'Guarda Fechada', art: 'jiujitsu', kind: 'defesa', minLevel: 8, price: 350, chance: 0.5, reduce: 0.5, cooldown: 1, description: '50% de chance de reduzir o dano pela metade.' }),
-  T({ id: 'foletatame', name: 'Fôlego de Tatame', art: 'jiujitsu', kind: 'passiva', minLevel: 10, price: 400, staPct: 0.2, description: '+20% de fôlego máximo.' }),
-  T({ id: 'mataleao', name: 'Mata-leão', art: 'jiujitsu', kind: 'ataque', minLevel: 14, price: 700, power: 23, stamina: 22, cooldown: 4, description: 'Estrangulamento pelas costas.' }),
+  T({ id: 'foletatame', name: 'Fôlego de Tatame', art: 'jiujitsu', kind: 'passiva', minLevel: 10, price: 400, requires: 'guardafechada', staPct: 0.2, description: '+20% de fôlego máximo.' }),
+  T({ id: 'mataleao', name: 'Mata-leão', art: 'jiujitsu', kind: 'ataque', minLevel: 14, price: 700, requires: 'chavebraco', power: 23, stamina: 22, cooldown: 4, description: 'Estrangulamento pelas costas.' }),
 
   // ---------- Capoeira ----------
   T({ id: 'meialua', name: 'Meia-lua de Frente', art: 'capoeira', kind: 'ataque', minLevel: 1, price: 0, power: 10, stamina: 6, cooldown: 0, description: 'Chute circular de frente.' }),
   T({ id: 'armada', name: 'Armada', art: 'capoeira', kind: 'ataque', minLevel: 1, price: 0, power: 14, stamina: 12, cooldown: 2, description: 'Chute giratório de costas.' }),
   T({ id: 'ginga', name: 'Ginga', art: 'capoeira', kind: 'defesa', minLevel: 1, price: 0, chance: 0.3, reduce: 1, cooldown: 3, description: '30% de chance de escapar totalmente de um golpe.' }),
   T({ id: 'rasteira', name: 'Rasteira', art: 'capoeira', kind: 'ataque', minLevel: 4, price: 180, power: 10, stamina: 8, cooldown: 3, stun: true, description: 'Derruba: o oponente perde a próxima ação.' }),
-  T({ id: 'martelo', name: 'Martelo', art: 'capoeira', kind: 'ataque', minLevel: 7, price: 280, power: 18, stamina: 14, cooldown: 2, description: 'Chute lateral na altura da cabeça.' }),
+  T({ id: 'martelo', name: 'Martelo', art: 'capoeira', kind: 'ataque', minLevel: 7, price: 280, requires: 'rasteira', power: 18, stamina: 14, cooldown: 2, description: 'Chute lateral na altura da cabeça.' }),
   T({ id: 'au', name: 'Aú', art: 'capoeira', kind: 'passiva', minLevel: 9, price: 400, dodge: 0.07, description: '+7% de esquiva permanente.' }),
-  T({ id: 'parafuso', name: 'Parafuso', art: 'capoeira', kind: 'ataque', minLevel: 14, price: 750, power: 24, stamina: 20, cooldown: 3, description: 'Chute giratório no ar.' }),
+  T({ id: 'parafuso', name: 'Parafuso', art: 'capoeira', kind: 'ataque', minLevel: 14, price: 750, requires: 'martelo', power: 24, stamina: 20, cooldown: 3, description: 'Chute giratório no ar.' }),
 ];
 
 export const TECH_BY_ID: Record<string, Technique> = Object.fromEntries(TECHNIQUES.map((t) => [t.id, t]));
