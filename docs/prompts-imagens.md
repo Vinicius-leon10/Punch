@@ -187,3 +187,77 @@ direto, gancho, uppercut, esquiva, bloqueio, nocauteado no chão.
 - No Midjourney, acrescente `--ar 16:9` nos cenários e telas, e `--cref <url da ficha>`
   para manter o personagem.
 - Peça fundo branco liso e remova o fundo depois para ter PNG transparente.
+
+---
+
+## 6. Versão para o Manus (colar tudo de uma vez)
+
+O Manus recebe instruções em linguagem natural e não usa parâmetros como `--ar` ou `--cref`.
+Cole o bloco abaixo como uma única tarefa.
+
+```
+Você vai criar as artes de um jogo 2D de boxe em modo carreira chamado "Punch".
+Todos os personagens são originais. Gere cada imagem separadamente, salve como PNG com o
+nome indicado e, no final, entregue tudo num arquivo .zip.
+
+ESTILO OBRIGATÓRIO EM TODAS AS IMAGENS:
+ilustração 2D de jogo de luta, cartoon semi-realista, traço grosso e limpo, cel shading
+com 3 tons, cores saturadas, iluminação dramática de ringue com luz de cima, proporções
+levemente exageradas (ombros e punhos grandes), visual consistente de game asset.
+NUNCA incluir: texto, marca d'água, logotipos, marcas reais, dedos extras, mãos ou rostos
+deformados, visual fotorrealista ou 3D.
+
+CONSISTÊNCIA: gere primeiro a imagem 01 e use-a como referência visual em todas as imagens
+em que o protagonista aparece (mesmo rosto, cabelo, cores e roupa).
+
+PERSONAGENS (corpo inteiro, fundo branco liso, quadrado 1:1):
+01_protagonista_ficha.png: ficha com 3 vistas lado a lado (frente, perfil, costas) de um
+boxeador de 20 anos, peso médio, cabelo curto cacheado, faixa branca na testa, shorts
+azul-marinho com listra dourada, luvas vermelhas gastas, bandagem nos punhos, expressão
+determinada. Formato horizontal 16:9.
+02_protagonista_evolucao.png: o mesmo boxeador em 3 fases lado a lado: iniciante com roupa
+simples de academia; profissional com shorts de cetim; campeão com cinturão dourado no ombro
+e roupão vermelho e dourado. Formato horizontal 16:9.
+03_rival_tanque.png: peso-pesado careca e barbudo, tatuagem tribal no braço, shorts verdes,
+muito forte, em guarda.
+04_rival_kenji.png: peso-leve ágil, rabo de cavalo, shorts brancos com estampa de onda azul,
+postura de esquiva.
+05_rival_dimitri.png: veterano alto de 40 anos, cicatriz no supercílio, shorts cinza-escuro,
+olhar frio, em guarda.
+06_rival_furacao.png: boxeadora agressiva de cabelo trançado, shorts roxo e laranja, sorriso
+provocador, guarda ofensiva.
+07_rival_martillo.png: boxeador showman de bigode, shorts vermelhos com franjas, máscara de
+tecido pendurada no pescoço, guarda confiante.
+
+CENÁRIOS (visão lateral, sem personagens, ringue na metade inferior, horizontal 16:9):
+08_cenario_academia.png: galpão velho com goteira, sacos de pancada remendados, luz
+fluorescente fria, ringue pequeno de cordas desbotadas.
+09_cenario_ginasio.png: ginásio com arquibancada de madeira meio cheia, faixas coloridas,
+luz quente.
+10_cenario_arena.png: estádio coberto lotado, telões, holofotes azuis e brancos, fumaça.
+11_cenario_mundial.png: arena gigante à noite, plateia como mar de luzes de celular,
+pirotecnia dourada.
+
+TELAS (horizontal 16:9):
+12_tela_titulo.png: protagonista em primeiro plano batendo os punhos, ringue iluminado ao
+fundo, espaço vazio no topo para o logotipo.
+13_menu_carreira.png: vestiário com armários, banco de madeira, luvas penduradas, quadro de
+cortiça com recortes de jornal e calendário de lutas, fundo levemente desfocado, área escura
+à esquerda para botões.
+
+RETRATOS "VS" (busto em 3/4, expressão intensa, luz lateral vermelha, fundo branco, 1:1):
+14_vs_protagonista.png, 15_vs_tanque.png, 16_vs_kenji.png, 17_vs_dimitri.png,
+18_vs_furacao.png, 19_vs_martillo.png (mesmo visual de cada personagem acima).
+
+ÍCONES (1:1, fundo branco, contorno grosso, grade 4x2):
+20_icones.png: luva de boxe, raio (energia), coração (vida), halter (força), tênis
+(velocidade), escudo (defesa), cinturão de campeão, troféu.
+
+SPRITES (visão lateral, fundo branco, mesmo tamanho e alinhamento em todos os quadros,
+horizontal):
+21_sprites_protagonista.png: 8 poses em linha: guarda, jab, direto, gancho, uppercut,
+esquiva, bloqueio, nocauteado no chão.
+
+Ao terminar, mostre uma prévia de todas as imagens e liste quais ficaram inconsistentes com
+a imagem 01, para eu pedir que sejam refeitas.
+```
