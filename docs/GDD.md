@@ -171,7 +171,18 @@ Meta: todas entre 45% e 55%. Rodar com `npx vite-node tests/balance.ts`.
 - Faixa vazia → o servidor completa com um **fantasma** gerado.
 - Vitória: **+25 pts** (+5 por nível que o oponente tiver acima de você). Derrota: **−15 pts** (não fica negativo).
 - Divisões: Bronze 0 · Prata 300 · Ouro 700 · Diamante 1200 · Campeão 2000.
-- **Temporada mensal**: no fim, prêmios por divisão (moedas, Ouro, visual exclusivo) e os pontos reiniciam parcialmente.
+- **Temporada mensal** (vira no dia 1, 00:00 UTC no protótipo): paga o prêmio da divisão em que o jogador terminou e
+  ele **mantém 50% dos pontos** (cai no máximo 2 divisões). Quem ficou meses sem jogar recebe um prêmio só.
+
+| Divisão | Prêmio de fim de temporada |
+|---|---|
+| Bronze | 100 moedas |
+| Prata | 250 moedas |
+| Ouro | 500 moedas + 5 Ouro |
+| Diamante | 900 moedas + 15 Ouro |
+| Campeão | 1500 moedas + 30 Ouro |
+
+  Visual exclusivo por divisão fica para quando existirem os itens visuais. O Ouro do topo não paga o VIP sozinho.
 - Custo da luta: 20 de energia e 12 de saciedade.
 
 ## 9. Economia
@@ -259,7 +270,7 @@ Sugestão para a fase 1: **Supabase** (banco Postgres, login Google/Apple pronto
 
 ## 13. Pontos em aberto
 - Nome definitivo do jogo e checagem de marca/domínio.
-- Prêmios exatos de cada divisão no fim da temporada e quanto dos pontos reinicia.
+- Prêmios de temporada e os 50% mantidos são valores iniciais; revisar com dados reais de jogadores.
 - Preço real do VIP e dos pacotes de Ouro.
 - Lista de itens visuais pagos (sem atributo) para a loja de Ouro.
 - Classificação indicativa (violência) e regras para menores de idade nas compras.

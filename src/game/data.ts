@@ -290,14 +290,18 @@ export interface Division {
   name: string;
   min: number;
   color: string;
+  /** Prêmio pago na virada da temporada para quem terminou nesta divisão. */
+  reward: { money: number; gold: number };
 }
 export const DIVISIONS: Division[] = [
-  { name: 'Bronze', min: 0, color: '#c07a3e' },
-  { name: 'Prata', min: 300, color: '#b8c4cc' },
-  { name: 'Ouro', min: 700, color: '#e8b923' },
-  { name: 'Diamante', min: 1200, color: '#5fd3f3' },
-  { name: 'Campeão', min: 2000, color: '#ff5470' },
+  { name: 'Bronze', min: 0, color: '#c07a3e', reward: { money: 100, gold: 0 } },
+  { name: 'Prata', min: 300, color: '#b8c4cc', reward: { money: 250, gold: 0 } },
+  { name: 'Ouro', min: 700, color: '#e8b923', reward: { money: 500, gold: 5 } },
+  { name: 'Diamante', min: 1200, color: '#5fd3f3', reward: { money: 900, gold: 15 } },
+  { name: 'Campeão', min: 2000, color: '#ff5470', reward: { money: 1500, gold: 30 } },
 ];
+/** Parte dos pontos de rank mantida na virada da temporada. */
+export const SEASON_KEEP = 0.5;
 
 export interface MissionDef {
   id: string;

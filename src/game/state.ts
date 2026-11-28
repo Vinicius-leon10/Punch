@@ -44,6 +44,14 @@ export interface Fighter {
   appearance: Appearance;
 }
 
+export interface SeasonResult {
+  season: string;
+  division: string;
+  points: number;
+  money: number;
+  gold: number;
+}
+
 export interface Player extends Fighter {
   version: 1;
   createdAt: number;
@@ -67,6 +75,10 @@ export interface Player extends Fighter {
   missionsDay: string;
   missions: Record<string, { progress: number; claimed: boolean }>;
   history: FightRecord[];
+  /** Temporada atual ("2026-11"). Saves antigos sem o campo recebem a temporada na primeira ação. */
+  season: string;
+  /** Resultado da última temporada encerrada, para mostrar ao jogador. */
+  lastSeason?: SeasonResult;
 }
 
 export const xpToNext = (level: number) => Math.round(50 + 20 * Math.pow(level, 1.2));
@@ -114,6 +126,17 @@ export function dayKey(now: number): string {
   return new Date(now).toISOString().slice(0, 10);
 }
 
+/** Temporada mensal (UTC no protótipo). */
+export function seasonKey(now: number): string {
+  return new Date(now).toISOString().slice(0, 7);
+}
+
+/** Início da próxima temporada (dia 1 do mês seguinte, 00:00 UTC). */
+export function seasonEndsAt(now: number): number {
+  const d = new Date(now);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+}
+
 export function freshMissions(): Player['missions'] {
   return Object.fromEntries(MISSIONS.map((m) => [m.id, { progress: 0, claimed: false }]));
 }
@@ -159,5 +182,6 @@ export function createPlayer(c: NewCharacter, now: number): Player {
     missionsDay: dayKey(now),
     missions: freshMissions(),
     history: [],
+    season: seasonKey(now),
   };
 }

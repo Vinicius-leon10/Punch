@@ -14,6 +14,7 @@ import {
   HAIR_COLORS,
   HAIR_STYLES,
   MISSIONS,
+  SEASON_KEEP,
   RARITY_LABEL,
   SKIN_TONES,
   SLOT_LABEL,
@@ -33,6 +34,7 @@ import {
   gearBonus,
   isVip,
   maxEnergy,
+  seasonEndsAt,
   xpToNext,
   type Fighter,
   type NewCharacter,
@@ -437,10 +439,14 @@ export function startApp(root: HTMLElement) {
     }
     const div = division(p.rankPoints);
     const nextDiv = DIVISIONS.find((d) => d.min > p.rankPoints);
+    const prize = (r: { money: number; gold: number }) => `${ic('coin', 14)} ${r.money}${r.gold ? ` + ${ic('gold', 14)} ${r.gold}` : ''}`;
+    const last = p.lastSeason;
     return `
     <div class="card">
-      <h2>Ranking PvP — temporada ${new Date(t).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</h2>
+      <h2>Ranking PvP — temporada ${new Date(t).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</h2>
       <p><span class="div" style="--c:${div.color}">${div.name}</span> ${p.rankPoints} pts ${nextDiv ? `· faltam ${nextDiv.min - p.rankPoints} para ${nextDiv.name}` : '· topo!'}</p>
+      <p class="small">Termina em ${fmtDuration(seasonEndsAt(t) - t)}. Prêmio se terminar agora: ${prize(div.reward)}. Na virada você mantém ${SEASON_KEEP * 100}% dos pontos.</p>
+      ${last ? `<p class="tiny muted">Temporada passada (${last.season}): ${last.division} com ${last.points} pts · ganhou ${prize(last)}.</p>` : ''}
       <p class="muted small">Só aparecem oponentes até ±${BALANCE.levelRange} níveis do seu. Vitória: +25 pts (mais se o oponente for de nível maior). Derrota: −15 pts, mas você ganha XP e moedas igual.
       Cada luta gasta ${BALANCE.fightEnergy} de energia e ${BALANCE.fightSatiety} de saciedade.</p>
       <p class="tiny muted">Protótipo: os oponentes são "fantasmas" gerados pelo jogo. Na versão online serão personagens de outros jogadores.</p>
@@ -576,8 +582,23 @@ export function startApp(root: HTMLElement) {
     });
   }
 
+  /** Avança o tempo do jogador e avisa quando uma temporada acabou de fechar. */
+  function tickPlayer(p: Player): boolean {
+    const season = p.season;
+    const energy = p.energy;
+    A.tick(p, now());
+    if (season && p.season !== season && p.lastSeason) {
+      const l = p.lastSeason;
+      toast = { msg: `Temporada encerrada! Você terminou em ${l.division} e ganhou ${l.money} moedas${l.gold ? ` e ${l.gold} de ouro` : ''}.`, ok: true, at: Date.now() };
+      save();
+      return true;
+    }
+    if (p.energy !== energy) save();
+    return false;
+  }
+
   function render() {
-    if (player) A.tick(player, now());
+    if (player) tickPlayer(player);
     root.innerHTML = player ? gameView(player) : createView();
     drawPortraits();
     animateStage();
@@ -709,9 +730,7 @@ export function startApp(root: HTMLElement) {
   // Atualiza o HUD a cada segundo (energia recarregando) sem redesenhar a tela toda.
   setInterval(() => {
     if (!player || fightHost.childElementCount) return;
-    const before = player.energy;
-    A.tick(player, now());
-    if (player.energy !== before) save();
+    if (tickPlayer(player)) return render();
     const el = root.querySelector('#hud');
     if (el) {
       el.innerHTML = hud(player);

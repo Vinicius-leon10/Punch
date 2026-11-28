@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { BALANCE, JOBS, TECHNIQUES } from '../src/game/data';
+import { BALANCE, DIVISIONS, JOBS, SEASON_KEEP, TECHNIQUES } from '../src/game/data';
 import { simulateFight } from '../src/game/fight';
 import { makeOpponent } from '../src/game/opponents';
-import { createPlayer, deckSlots, effectiveAttrs, xpToNext } from '../src/game/state';
+import { createPlayer, deckSlots, effectiveAttrs, seasonEndsAt, xpToNext } from '../src/game/state';
 import * as A from '../src/game/actions';
 
 const T0 = Date.UTC(2026, 10, 24, 12);
@@ -212,5 +212,56 @@ describe('pré-requisitos de técnicas', () => {
         if (t.requires) expect(o.techniques).toContain(t.requires);
       }
     }
+  });
+});
+
+describe('temporada', () => {
+  const NEXT = Date.UTC(2026, 11, 1, 0, 0, 1); // T0 é novembro de 2026
+  it('termina no dia 1 do mês seguinte', () => {
+    expect(seasonEndsAt(T0)).toBe(Date.UTC(2026, 11, 1));
+  });
+  it('paga o prêmio da divisão e mantém parte dos pontos', () => {
+    const p = newPlayer();
+    p.rankPoints = 750; // Ouro
+    const money = p.money;
+    const gold = p.gold;
+    A.tick(p, NEXT);
+    const ouro = DIVISIONS.find((d) => d.name === 'Ouro')!;
+    expect(p.money).toBe(money + ouro.reward.money);
+    expect(p.gold).toBe(gold + ouro.reward.gold);
+    expect(p.rankPoints).toBe(Math.floor(750 * SEASON_KEEP));
+    expect(p.lastSeason).toMatchObject({ season: '2026-11', division: 'Ouro', points: 750 });
+    expect(p.season).toBe('2026-12');
+  });
+  it('paga uma vez só, mesmo depois de meses parado', () => {
+    const p = newPlayer();
+    A.tick(p, Date.UTC(2027, 3, 10));
+    const money = p.money;
+    A.tick(p, Date.UTC(2027, 3, 11));
+    expect(p.money).toBe(money);
+  });
+  it('save antigo sem temporada não ganha prêmio na hora', () => {
+    const p = newPlayer() as Partial<ReturnType<typeof newPlayer>>;
+    delete p.season;
+    const full = p as ReturnType<typeof newPlayer>;
+    const money = full.money;
+    A.tick(full, T0);
+    expect(full.season).toBe('2026-11');
+    expect(full.money).toBe(money);
+  });
+  it('prêmios crescem com a divisão e o reinício derruba no máximo 2 divisões', () => {
+    for (let i = 1; i < DIVISIONS.length; i++) {
+      expect(DIVISIONS[i].reward.money).toBeGreaterThan(DIVISIONS[i - 1].reward.money);
+      expect(DIVISIONS[i].reward.gold).toBeGreaterThanOrEqual(DIVISIONS[i - 1].reward.gold);
+    }
+    for (let i = 0; i < DIVISIONS.length; i++) {
+      const kept = Math.floor(DIVISIONS[i].min * SEASON_KEEP);
+      const after = DIVISIONS.filter((d) => d.min <= kept).length - 1;
+      expect(i - after).toBeLessThanOrEqual(2);
+    }
+  });
+  it('o ouro de uma temporada inteira no topo não paga o VIP sozinho', () => {
+    const top = DIVISIONS[DIVISIONS.length - 1].reward.gold;
+    expect(top).toBeLessThan(BALANCE.vipGoldPrice);
   });
 });

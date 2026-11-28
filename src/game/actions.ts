@@ -12,12 +12,13 @@ import {
   STATIONS,
   TECH_BY_ID,
   ATTR_LABEL,
+  SEASON_KEEP,
   type Technique,
 } from './data';
 import { simulateFight, type FightResult } from './fight';
 import { hashString } from './rng';
 import { makeOpponent } from './opponents';
-import { dayKey, deckSlots, freshMissions, isVip, maxEnergy, xpToNext, type Fighter, type Player } from './state';
+import { dayKey, deckSlots, division, freshMissions, isVip, maxEnergy, seasonKey, xpToNext, type Fighter, type Player } from './state';
 
 export type Result = { ok: true; msg: string } | { ok: false; msg: string };
 const ok = (msg: string): Result => ({ ok: true, msg });
@@ -42,6 +43,24 @@ export function tick(p: Player, now: number): void {
     p.missionsDay = day;
     p.missions = freshMissions();
   }
+  endSeasonIfDue(p, now);
+}
+
+/**
+ * Fecha a temporada quando o mês muda: paga o prêmio da divisão em que o jogador terminou e mantém
+ * parte dos pontos. Paga uma vez só, mesmo que o jogador tenha ficado meses sem entrar.
+ */
+export function endSeasonIfDue(p: Player, now: number): boolean {
+  const current = seasonKey(now);
+  if (!p.season) p.season = current;
+  if (p.season === current) return false;
+  const div = division(p.rankPoints);
+  p.money += div.reward.money;
+  p.gold += div.reward.gold;
+  p.lastSeason = { season: p.season, division: div.name, points: p.rankPoints, money: div.reward.money, gold: div.reward.gold };
+  p.rankPoints = Math.floor(p.rankPoints * SEASON_KEEP);
+  p.season = current;
+  return true;
 }
 
 /** Milissegundos até o próximo ponto de energia. */
