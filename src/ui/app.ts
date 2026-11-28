@@ -207,22 +207,36 @@ export function startApp(root: HTMLElement) {
     </div>`;
   }
 
+  /** Atalhos coloridos da tela inicial (as abas principais ficam na barra de baixo). */
+  const QUICK: { id: Tab; bg: string }[] = [
+    { id: 'trabalho', bg: 'linear-gradient(#ffb347, #e07a1f)' },
+    { id: 'loja', bg: 'linear-gradient(#ff7aa8, #e23b6a)' },
+    { id: 'missoes', bg: 'linear-gradient(#4cd964, #22a548)' },
+    { id: 'vip', bg: 'linear-gradient(#ffd23f, #f29a1b)' },
+  ];
+
   function home(p: Player): string {
-    const left: Tab[] = ['academia', 'mestres', 'lutador', 'trabalho'];
-    const right: Tab[] = ['casa', 'loja', 'missoes', 'vip'];
     const missionsReady = MISSIONS.some((m) => (p.missions[m.id]?.progress ?? 0) >= m.goal && !p.missions[m.id]?.claimed);
-    const btn = (id: Tab) =>
-      `<button class="mbtn" data-act="tab" data-arg="${id}">${ic(MENU[id].icon, 28)}<span><b>${MENU[id].label}</b><small>${MENU[id].hint}</small></span>${
+    const rb = ({ id, bg }: { id: Tab; bg: string }) =>
+      `<button class="rb" data-act="tab" data-arg="${id}" style="--bg:${bg}" aria-label="${MENU[id].label}: ${MENU[id].hint}"><span class="rb-ic">${ic(MENU[id].icon, 26)}${
         id === 'missoes' && missionsReady ? '<i class="badge">!</i>' : ''
-      }</button>`;
+      }</span><small>${MENU[id].label}</small></button>`;
     return `
     <section class="stage">
       <canvas id="stage" aria-label="${esc(p.nickname)} em frente à academia"></canvas>
       <div class="stage-tag"><b>${esc(p.nickname)}</b><small>${p.wins}V · ${p.losses}D</small></div>
-      <nav class="menu menu-l">${left.map(btn).join('')}</nav>
-      <nav class="menu menu-r">${right.map(btn).join('')}</nav>
-      <button class="fight-cta" data-act="tab" data-arg="lutar">${ic('fight', 34)}<span>LUTAR</span><small>${BALANCE.fightEnergy} de energia</small></button>
+      <nav class="quick">${QUICK.map(rb).join('')}</nav>
+      <button class="fight-cta" data-act="tab" data-arg="lutar"><span>LUTAR</span><small>Partida ranqueada · ${BALANCE.fightEnergy} de energia</small></button>
     </section>`;
+  }
+
+  /** Barra de abas fixa embaixo, como no app: Casa · Treinar · Arena (início) · Mestres · Lutador. */
+  function tabBar(): string {
+    const item = (id: Tab | null, label: string, icon: string) => {
+      const on = tab === id || (id === null && (tab === null || tab === 'lutar'));
+      return `<button class="tab ${on ? 'on' : ''}" data-act="${id ? 'tab' : 'home'}" ${id ? `data-arg="${id}"` : ''} ${on ? 'aria-current="page"' : ''}><span class="tab-ic">${ic(icon, 22)}</span>${label}</button>`;
+    };
+    return `<nav class="tabs" aria-label="Navegação">${item('casa', 'Casa', 'home')}${item('academia', 'Treinar', 'train')}${item(null, 'Arena', 'fight')}${item('mestres', 'Mestres', 'master')}${item('lutador', 'Lutador', 'fighter')}</nav>`;
   }
 
   // ---------------- Abas ----------------
@@ -538,7 +552,7 @@ export function startApp(root: HTMLElement) {
     const views: Record<Tab, (p: Player) => string> = { casa, academia, mestres, lutador, trabalho, loja, lutar, missoes, vip };
     const body = tab
       ? `<section class="panel">
-          <div class="panel-head"><button class="back" data-act="home">${ic('back', 14)} Menu</button><h1>${ic(MENU[tab].icon, 26)} ${PANEL_TITLE[tab]}</h1></div>
+          <div class="panel-head"><button class="back" data-act="home" aria-label="Voltar">${ic('back', 14)}</button><h1>${ic(MENU[tab].icon, 26)} ${PANEL_TITLE[tab]}</h1></div>
           ${views[tab](p)}
         </section>`
       : home(p);
@@ -546,6 +560,7 @@ export function startApp(root: HTMLElement) {
     <header class="hud" id="hud">${hud(p)}</header>
     ${toast && Date.now() - toast.at < 6000 ? `<div class="toast ${toast.ok ? 'ok' : 'err'}" role="status">${esc(toast.msg)}</div>` : ''}
     <main>${body}</main>
+    ${tabBar()}
     <footer class="dev">
       <span>Protótipo v0.2 · modo teste</span>
       <button data-act="skip" data-arg="1">Avançar 1h</button>
