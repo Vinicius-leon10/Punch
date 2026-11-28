@@ -168,47 +168,48 @@ ICONS = same chunky pixel art style and size as the golden crown reference image
 
 ---
 
-## LOTE 7: oponentes e começo da versão feminina
+## LOTE 7: versão feminina (menu, perfil e luta)
+Os oponentes 4 a 8 que estavam aqui já vieram na folha do ChatGPT. Os golpes da Lote 8 subiram para cá.
 **Anexe:** `art/v1/02_protagonista_iniciante_mulher.png`
 
 ```
-Create 10 separate images. Each image must be its own transparent PNG file (real transparency, no checkerboard, no text, no labels), one single character per image, full body unless stated, centered.
+Create 10 separate images. Each image must be its own PNG file with REAL transparency (alpha channel). Do NOT draw a checkerboard or any background pattern. No text, no labels. One single character per image, full body unless stated, centered.
 
 STYLE FOR ALL: 2D pixel art, retro 90s game look, chunky pixels, no anti-aliasing, dark outline, warm gritty color palette.
-PLAYER = the young female street fighter from the reference image (brown hair tied in a ponytail, white sports top, faded shorts, taped hands, dark sneakers).
+PLAYER = ALWAYS the same young female street fighter from the reference image (brown hair tied in a ponytail, white sports top, faded shorts, hands wrapped in white tape, dark sneakers). Same face, same hair, same clothes in every image.
 
-1. oponente_4.png — street fighter woman with braids, black sports top, purple shorts, side view facing LEFT, guard stance
-2. oponente_5.png — street fighter, older man with gray hair and a scar on the face, brown shorts, side view facing LEFT, guard stance
-3. oponente_6.png — street fighter, young man with a big afro, yellow shorts, side view facing LEFT, guard stance
-4. oponente_7.png — street fighter, muscular woman with a short ponytail, red shorts, side view facing LEFT, guard stance
-5. oponente_8.png — street fighter, big bearded man with long blond hair in a braid, gray shorts, side view facing LEFT, guard stance
-6. lona_f_menu.png — PLAYER, front view facing the viewer, fighting stance with both fists raised in front of the face, feet apart, confident look
-7. lona_f_personalizacao.png — PLAYER, front view, standing straight and relaxed, arms hanging down at the sides, feet slightly apart, neutral expression, symmetrical pose
-8. lona_f_perfil.png — PLAYER, front view, head and shoulders only, slight confident smile, square image
-9. lona_f_vs.png — PLAYER, front view, waist up, intense stare, one fist raised close to the camera, dramatic pose
-10. lona_f_guarda.png — PLAYER, side view facing right, fighting guard stance with fists up
+1. lona_f_menu.png — front view facing the viewer, fighting stance with both fists raised in front of the face, feet apart, confident look
+2. lona_f_personalizacao.png — front view, standing straight and relaxed, arms hanging down at the sides, feet slightly apart, neutral expression, symmetrical pose
+3. lona_f_perfil.png — front view, head and shoulders only, slight confident smile, square image
+4. lona_f_vs.png — front view, waist up, intense stare, one fist raised close to the camera, dramatic pose
+5. lona_f_guarda.png — side view facing right, fighting guard stance with fists up
+6. lona_f_soco.png — side view facing right, straight punch with the arm fully extended
+7. lona_f_chute_alto.png — side view facing right, high roundhouse kick at head height, kicking leg fully extended, standing leg slightly bent
+8. lona_f_golpe.png — side view facing right, getting hit in the face, head snapping back, eyes closed, normal colors
+9. lona_f_defesa.png — side view facing right, blocking with both forearms covering the face
+10. lona_f_nocaute.png — side view, lying flat on her back knocked out, eyes closed, small stars above the head
 ```
 
 ---
 
-## LOTE 8: versão feminina (luta e resultado)
+## LOTE 8: versão feminina (resultado, avisos e dia a dia)
 **Anexe:** `art/v1/02_protagonista_iniciante_mulher.png`
 
 ```
-Create 10 separate images. Each image must be its own transparent PNG file (real transparency, no checkerboard, no text, no labels), one single character per image, full body, centered.
+Create 10 separate images. Each image must be its own PNG file with REAL transparency (alpha channel). Do NOT draw a checkerboard or any background pattern. No text, no labels. One single character per image, full body, centered.
 
 STYLE FOR ALL: 2D pixel art, retro 90s game look, chunky pixels, no anti-aliasing, dark outline, warm gritty color palette. The character is ALWAYS the young female street fighter from the reference image (brown hair tied in a ponytail, white sports top, faded shorts, taped hands, dark sneakers).
 
-1. lona_f_soco.png — side view facing right, straight punch with the arm fully extended
-2. lona_f_chute_alto.png — side view facing right, high roundhouse kick at head height
-3. lona_f_golpe.png — side view facing right, getting hit in the face, head snapping back, eyes closed, normal colors
-4. lona_f_defesa.png — side view facing right, blocking with both forearms covering the face
-5. lona_f_nocaute.png — side view, lying flat on her back knocked out, eyes closed, small stars above the head
-6. lona_f_vitoria.png — front view, celebrating, both arms raised high with fists closed, shouting with joy
-7. lona_f_derrota.png — front view, sitting on the floor with knees bent up, exactly two feet with two shoes, arms on the knees, head down, tired, correct anatomy
-8. lona_f_nivel.png — front view, flexing both biceps proudly, big smile, small yellow sparkles around
-9. lona_f_energia.png — front view, exhausted, bent forward with hands on the knees, sweating
-10. lona_f_fome.png — front view, one hand on her stomach, hungry tired face
+1. lona_f_vitoria.png — front view, celebrating, both arms raised high with fists closed, shouting with joy
+2. lona_f_derrota.png — front view, sitting on the floor with knees bent up, exactly two feet with two shoes, arms on the knees, head down, tired, correct anatomy
+3. lona_f_nivel.png — front view, flexing both biceps proudly, big smile, small yellow sparkles around
+4. lona_f_energia.png — front view, exhausted, bent forward with hands on the knees, sweating
+5. lona_f_fome.png — front view, one hand on her stomach, hungry tired face
+6. lona_f_joinha.png — front view, thumbs up with one hand and winking, happy smile
+7. lona_f_loja.png — front view, holding a pair of new red boxing gloves up with both hands, excited smile
+8. lona_f_mestres.png — three-quarter view facing right, martial arts salute with fist against open palm, slight bow
+9. lona_f_treino_saco.png — side view facing right, punching a hanging heavy leather bag at the moment of impact (include the bag)
+10. lona_f_treino_corda.png — front view, jumping rope, both feet in the air (include the rope)
 ```
 
 ---
@@ -221,17 +222,16 @@ Create 10 separate images. Each image must be its own transparent PNG file (real
 
 STYLE FOR ALL: 2D pixel art, retro 90s game look, chunky pixels, no anti-aliasing, dark outline, warm gritty color palette. The character is ALWAYS the young female street fighter from the reference image (brown hair tied in a ponytail, white sports top, faded shorts, taped hands). Include the equipment or furniture described, nothing else.
 
-1. lona_f_treino_saco.png — side view facing right, punching a hanging heavy leather bag at the moment of impact
-2. lona_f_treino_corda.png — front view, jumping rope, both feet in the air
-3. lona_f_treino_abdominal.png — side view, doing sit-ups on a gym mat holding a medicine ball
-4. lona_f_treino_manopla.png — side view facing right, punching focus mitts held by an old gray-haired coach, both full body
-5. lona_f_treino_esteira.png — side view facing right, running on an old treadmill, sweating
-6. lona_f_dormindo.png — side view, sleeping on her back on a simple single bed, small "Z" letters floating
-7. lona_f_comendo.png — three-quarter view, sitting at a small wooden table eating a plate of rice, beans and chicken
-8. lona_f_descansando.png — three-quarter view, sitting on the edge of a bed with a towel around the neck, drinking water
-9. lona_f_loja.png — front view, holding a pair of new red boxing gloves up with both hands, excited smile, full body
-10. lona_f_mestres.png — three-quarter view facing right, martial arts salute with fist against open palm, slight bow, full body
+1. lona_f_treino_abdominal.png — side view, doing sit-ups on a gym mat holding a medicine ball
+2. lona_f_treino_manopla.png — side view facing right, punching focus mitts held by an old gray-haired coach, both full body
+3. lona_f_treino_esteira.png — side view facing right, running on an old treadmill, sweating
+4. lona_f_dormindo.png — side view, sleeping on her back on a simple single bed, small "Z" letters floating
+5. lona_f_comendo.png — three-quarter view, sitting at a small wooden table eating a plate of rice, beans and chicken
+6. lona_f_descansando.png — three-quarter view, sitting on the edge of a bed with a towel around the neck, drinking water
+7. lona_f_protetor.png — front view close-up, head and shoulders, smiling to show a white mouthguard, square image
 ```
+
+Sobram 3 vagas neste lote: dá para juntar com o próximo pedido.
 
 ---
 
@@ -251,6 +251,4 @@ STYLE FOR ALL: 2D pixel art, retro 90s game look, chunky pixels, no anti-aliasin
 6. lona_f_luva_azul.png — now wearing blue leather boxing gloves, arms relaxed
 7. lona_f_luva_roxa.png — now wearing shiny purple professional boxing gloves, arms relaxed
 8. lona_f_luva_ouro.png — now wearing golden legendary boxing gloves with a soft glow, arms relaxed
-9. lona_f_joinha.png — front view, thumbs up with one hand and winking, happy smile
-10. lona_f_protetor.png — front view close-up, head and shoulders, smiling to show a white mouthguard, square image
 ```
